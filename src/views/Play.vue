@@ -1,0 +1,446 @@
+<template>
+  <transition name="song" appear>
+    <div class="play-container">
+      <img :src="songInfo.imgUrl" alt="" class="bg" />
+      <header>
+        <i class="back iconfont icon-xia" @click="back"></i>
+        <section class="info">
+          <p>{{ songInfo.name }}</p>
+          <p>{{ songInfo.artist }}</p>
+        </section>
+      </header>
+      <main>
+        <section class="body">
+          <div class="status" :class="isPlay ? '' : 'play'"></div>
+          <div class="top" style="height: 80%">
+            <div class="center">
+              <img
+                class="img"
+                :src="songInfo.imgUrl"
+                :style="'transform:rotateZ(' + playParams.rot + 'deg)'"
+                alt=""
+              />
+            </div>
+          </div>
+          <!-- 歌词滚动 -->
+          <section class="gc" ref="slider">
+            <ul
+              ref="slid"
+              :style="`transform:translateY(${-translate*gcHeight}px)`"
+              style="transition: all 0.5s ease-in-out"
+            >
+              <li
+                class="slid-item"
+                :style="'height:' + gcHeight + 'px'"
+                v-for="(item, i) in gcList"
+                :key="i"
+                :class="translate === i ? 'gcAct' : ''"
+                ref="gcItem"
+              >
+                {{ item.msg }}
+              </li>
+            </ul>
+          </section>
+        </section>
+
+        <section class="controls">
+          <div class="v">
+            倍速听歌
+            <span
+              class="speed-item"
+              v-for="(item, i) in speed"
+              :key="i"
+              :class="speedIndex == i ? 'act' : ''"
+              @click="changeSpeed(i)"
+              >x{{ item }}</span
+            >
+          </div>
+          <div class="line">
+            <span class="nowtime">{{ formatMinutes(audio.currentTime) }}</span>
+            <van-slider
+              :value="toInt(audio.currentTime)"
+              bar-height=".1rem"
+              :max="songInfo.duration"
+              inactive-color="rgba(0,0,0,.36)"
+              active-color="#ee0a24"
+              @change="changeSongDuration"
+            >
+              <template #button>
+                <div class="slider-btn"></div>
+              </template>
+            </van-slider>
+            <span class="alltime">{{ formatMinutes(songInfo.duration) }}</span>
+          </div>
+
+          <div class="control">
+            <i class="iconfont icon-danquxunhuan"></i>
+            <i class="iconfont icon-previous"></i>
+            <van-icon
+              name="pause-circle-o"
+              size="1rem"
+              v-if="isPlay"
+              @click="pause"
+            />
+            <van-icon name="play-circle-o" size="1rem" v-else @click="play" />
+            <i class="iconfont icon-next-music"></i>
+            <i class="iconfont icon-bofangliebiao"></i>
+          </div>
+          <audio :src="songInfo.playUrl" autoplay ref="audio"></audio>
+        </section>
+      </main>
+    </div>
+  </transition>
+</template>
+
+<script>
+import { formatMinutes } from "../tools/tools";
+import Swiper from "swiper";
+import { song, songDetail, lyric, album } from "../server/server";
+import { mapMutations, mapState } from "vuex";
+export default {
+  created() {
+    this.init();
+  },
+  computed: {
+    ...mapState(["songInfo"]),
+  },
+  data() {
+    return {
+      speed: [0.75, 1, 1.25, 1.5, 2],
+      speedIndex: 1,
+      audio: {
+        currentTime: 0,
+      },
+      translate: 0,
+      gcHeight: 0,
+      curDalay: 1200,
+      per: 20,
+      // 播放参数
+      playParams: {
+        rot: 0,
+        time: 0,
+      },
+      gcIndx: 0,
+      gcList: [],
+      // 暂停参数
+      pauseParams: {},
+      isPlay: false,
+      timer: null,
+      slider: null,
+    };
+  },
+  mounted() {
+    // this.initSwiper();
+    this.setHeight();
+  },
+  methods: {
+    // 设置单个歌词的高度
+    setHeight() {
+      const parentHeight = parseInt(
+        getComputedStyle(this.$refs.slider, null).height
+      );
+      this.gcHeight = parentHeight / 2;
+    },
+    // 初始化swiper
+    initSwiper() {
+      // const el = this.$refs.slider;
+      // this.slider = new Swiper(el, {
+      //    // init:false,
+      //   //  initialSlide: 1,
+      //     direction: "vertical", // 垂直切换选项
+      //     loop: true, // 循环模式选项
+      //     speed: 500,
+      //     slidesPerView: 2,
+      //     allowTouchMove:false,
+      //     on:{
+      //       slideChange:()=>{
+      //         this.gcIndx = this.slider?.activeIndex || 1
+      //       }
+      //     },
+      //     autoplay:{
+      //       delay:this.curDalay
+      //     },
+      //     observer: true, //修改swiper自己或子元素时，自动初始化swiper
+      //     observeParents: false, //修改swiper的父元素时，自动初始化swiper
+      // });
+    },
+    // 返回上一级
+    back() {
+      // console.log(this.songInfo)
+      // 返回之前保存当前的播放状态
+      this.setSongInfo({
+        id:'',
+        gcIndex:this.translate,
+        currentTime:this.audio.currentTime,
+        isPlay:this.isPlay
+      })
+      console.log(this.songInfo)
+      this.$router.back();
+    },
+    // 改变播放速度
+    changeSpeed(i) {
+      this.speedIndex = i;
+      this.audio.playbackRate = this.speed[i];
+    },
+    // 更改播放歌曲的当前时间
+    changeSongDuration(val) {
+      this.audio.currentTime = val;
+    },
+    // 设置暂停状态
+    setPauseStatus() {
+      clearInterval(this.timer);
+      this.timer = null;
+    },
+    // 设置播放状态
+    setPlayStatus() {
+      clearInterval(this.timer);
+      this.timer = setInterval(() => {
+        this.playParams.rot += 0.3 * this.speed[this.speedIndex];
+      }, 16.7);
+    },
+    // 暂停歌曲
+    pause() {
+      this.isPlay = false;
+      this.audio.pause();
+      this.setPauseStatus();
+    },
+    // 播放歌曲
+    play() {
+      this.isPlay = true;
+      try {
+        this.audio.play();
+      } catch {}
+      this.setPlayStatus();
+    },
+    // 设置事件监听
+    setAudioEvents() {
+      // 监听能否播放
+      this.audio.addEventListener("canplay", () => {
+        this.setSongInfo({ duration: this.audio.duration });
+      });
+      this.audio.addEventListener("timeupdate", () => {
+        let index = this.gcList.findIndex((item) => {
+          return item.start > this.audio.currentTime;
+        });
+        this.translate = index - 1;
+      });
+    },
+    // 初始化数据
+    init() {
+      if(this.songInfo.id){
+        // 已经播放的歌曲，设置播放的状态
+        return 
+      }
+      song().then((res) => {
+        this.setSongInfo({ playUrl: res.data.data[0].url });
+        this.audio = this.$refs.audio;
+        // 音频加载完成，设置事件监听
+        this.setAudioEvents();
+      });
+
+      // 歌曲封面
+      songDetail().then((res) => {
+        this.setSongInfo({
+          imgUrl: res.data.songs[0].al.picUrl,
+          name: res.data.songs[0].name,
+          artist: res.data.songs[0].ar[0].name,
+        });
+      });
+      // 歌词
+      lyric().then((res) => {
+        let arr = res.data.lrc.lyric.split(/\n/);
+        let arr2 = arr
+          .map((item) => {
+            let temp = item.split("]");
+            let arr = temp[0]
+              .replace("[", "")
+              .replace(/\.(.*)/, "")
+              .split(":");
+            let start = +arr[0] * 60 + arr[1] * 1;
+            let msg = temp[1];
+            return {
+              start,
+              msg,
+            };
+          })
+          .filter((item) => item.msg);
+        let half = parseInt(arr2[0].start / 2);
+        this.gcList = [
+          { start: 0, msg: this.songInfo.name },
+          { start: half, msg: this.songInfo.artist },
+        ].concat(arr2);
+        // **
+      });
+      this.play();
+    },
+    // 工具函数和辅助函数
+    ...mapMutations(["setSongInfo"]),
+    formatMinutes: formatMinutes,
+    toInt(num) {
+      return parseInt(num);
+    },
+  },
+};
+</script>
+
+<style lang='scss' scoped>
+.icon-zantingtingzhi {
+  transform: scale(1.2) translateX(-0.12rem);
+}
+
+.gcAct {
+  color: red !important;
+}
+
+.play-container {
+  position: fixed;
+  transform-origin: 0 100%;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  .bg {
+    width: 100%;
+    height: 100%;
+    opacity: 0.88;
+    filter: blur(30px);
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+  }
+  header {
+    height: 1.2rem;
+    display: flex;
+    align-items: center;
+    border-bottom: 0.01rem solid #e2e2e248;
+    .back {
+      flex: 0;
+      font-size: 0.52rem;
+      margin: 0 0.12rem;
+    }
+    .info {
+      flex: 1;
+      font-size: 0.32rem;
+    }
+  }
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    .body {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      .status {
+        position: absolute;
+        top: -0.4rem;
+        left: calc(50% - 0.56rem);
+        width: calc(138px * 0.8);
+        height: calc(207px * 0.8);
+        transform-origin: 0.4rem 0.4rem;
+        background: url(../assets/imgs/needle.png) no-repeat;
+        background-size: 100%;
+        z-index: 9;
+        transform: rotateZ(-8deg);
+        transition: all 0.3s ease-in-out;
+      }
+      .play {
+        transform: rotateZ(-32deg);
+      }
+      .center {
+        width: 70vw;
+        height: 70vw;
+        position: absolute;
+        top: 46%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: url(../assets/imgs/bg-cycle.png);
+        background-size: 100% 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .img {
+          width: 68%;
+          height: 68%;
+          border-radius: 50%;
+        }
+      }
+      .gc {
+        font-size: 0.32rem;
+        flex: 1;
+        padding: 0 10vw;
+        overflow: hidden;
+        ul {
+          li {
+            display: flex;
+            text-align: center;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            line-height: 2.5em;
+          }
+        }
+      }
+    }
+    .controls {
+      height: 24vh;
+      background-color: rgba(173, 216, 230, 0.486);
+      padding: 0.2rem;
+      .v {
+        display: flex;
+        font-size: 0.32rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        padding: 0.2rem 5vw;
+        color: #efeffec7;
+        .speed-item {
+          padding: 0.05rem 0.12rem;
+          border: 0.01rem solid transparent;
+          border-radius: 0.12rem;
+        }
+        .act {
+          border-color: #ffa400;
+        }
+      }
+      .line {
+        padding: 0 5vw;
+        padding-top: 0.2rem;
+        display: flex;
+        align-items: center;
+        span {
+          font-size: 0.32rem;
+          margin: 0 0.28rem;
+          &:last-child {
+            margin-left: 0.12rem;
+          }
+        }
+      }
+      .control {
+        display: flex;
+        padding: 0.66rem 0;
+        padding-bottom: 0;
+        justify-content: space-around;
+        .iconfont {
+          font-size: 0.88rem;
+          color: #333;
+        }
+      }
+    }
+  }
+}
+.slider-btn {
+  border: 0.06rem solid white;
+  background: #ee0a25d2;
+  border-radius: 9rem;
+  width: 0.2rem;
+  height: 0.2rem;
+}
+</style>

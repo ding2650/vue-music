@@ -1,2 +1,1 @@
-# vue-music
-this is a vue project of music
+### Vue 2.0 + 网易云API 的移动端播放器

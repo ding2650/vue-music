@@ -1,0 +1,60 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+html,
+body{
+    font-size: 100px;
+    background-color: var(--bg-color);
+}
+#app {
+    font-size: .36rem;
+}
+a{
+    color: #eee;
+}
+/* 颜色 */
+#light-theme{
+    --font-color:#333;
+    --bg-color:#f0f0f4;
+}
+:root{
+    --bg-color:#f0f0f4;
+    --color:#00aefd;
+
+}
+/* 动画 */
+/* 播放旋转动画 */
+@keyframes rot {
+    to{
+        transform: rotateZ(360deg);
+    }
+}
+/* 缩至左下角 */
+.song-enter,
+.song-leave-to{
+    opacity: 0;
+    transform:  scale(0);
+}
+.song-enter-active,
+.song-leave-active{
+    transition: all .36s ease-in-out;
+}
+/* 标题前的竖条 */
+.vertical-line{
+    position: relative;
+    padding-left: .18rem !important;
+}
+.vertical-line::before{
+    content: '';
+    height: 100%;
+    width: .05rem;
+    border-radius: 99px;
+    background-color: var(--color);
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform: scaleY(.66);
+}
+
+

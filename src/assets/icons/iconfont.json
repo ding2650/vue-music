@@ -1,0 +1,79 @@
+{
+  "id": "2104164",
+  "name": "no name",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "224557",
+      "name": "循环",
+      "font_class": "xunhuan",
+      "unicode": "e630",
+      "unicode_decimal": 58928
+    },
+    {
+      "icon_id": "1035522",
+      "name": "下",
+      "font_class": "xia",
+      "unicode": "e63e",
+      "unicode_decimal": 58942
+    },
+    {
+      "icon_id": "2677209",
+      "name": "播放列表",
+      "font_class": "bofangliebiao",
+      "unicode": "e7da",
+      "unicode_decimal": 59354
+    },
+    {
+      "icon_id": "6082690",
+      "name": "随机播放",
+      "font_class": "bofangye-caozuolan-suijibofang",
+      "unicode": "e609",
+      "unicode_decimal": 58889
+    },
+    {
+      "icon_id": "6703660",
+      "name": "上一首",
+      "font_class": "previous",
+      "unicode": "e600",
+      "unicode_decimal": 58880
+    },
+    {
+      "icon_id": "7961099",
+      "name": "播放",
+      "font_class": "bofang",
+      "unicode": "e601",
+      "unicode_decimal": 58881
+    },
+    {
+      "icon_id": "8081202",
+      "name": "单曲循环",
+      "font_class": "danquxunhuan",
+      "unicode": "e6ac",
+      "unicode_decimal": 59052
+    },
+    {
+      "icon_id": "8358867",
+      "name": "下一首",
+      "font_class": "next-music",
+      "unicode": "e602",
+      "unicode_decimal": 58882
+    },
+    {
+      "icon_id": "17500065",
+      "name": "暂停 停止",
+      "font_class": "zantingtingzhi",
+      "unicode": "e660",
+      "unicode_decimal": 58976
+    },
+    {
+      "icon_id": "14323176",
+      "name": "右",
+      "font_class": "you",
+      "unicode": "e7ac",
+      "unicode_decimal": 59308
+    }
+  ]
+}
