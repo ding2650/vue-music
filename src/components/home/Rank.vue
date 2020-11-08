@@ -1,5 +1,5 @@
 <template>
-  <div class="rec" ref="content">
+  <div class="rank" ref="content">
     <div class="bs" ref="bs">
       <div class="vertical-line title">官方榜</div>
       <ul class="off-ranks">
@@ -17,20 +17,29 @@
       </ul>
       <!-- 剩余榜单 -->
       <div class="vertical-line title" style="margin-top: 0.18rem">全球榜</div>
-      <div class="body"></div>
+      <div class="body">
+        <section class=""></section>
+      </div>
     </div>
+    <Loading :show="loading" />
+
   </div>
 </template>
 
 <script>
 import BS from "better-scroll";
 import { rankList } from "@api/server";
+import Loading from "../common/Loading";
 export default {
   name: "Rank",
+  components: {
+    Loading,
+  },
   data() {
     return {
       scroll: null,
       topRanks: [],
+      loading: true,
       allRanks: [],
     };
   },
@@ -39,6 +48,7 @@ export default {
   },
   methods: {
     getList() {
+      this.loading = true;
       rankList().then((res) => {
         this.topRanks = res.data.list.filter((k, i) => {
           return i <= 3;
@@ -48,21 +58,23 @@ export default {
         });
         this.$nextTick(() => {
           this.initScroll();
+          this.loading = false;
         });
       });
     },
     initScroll() {
       this.scroll = new BS(this.$refs.content, {});
+      console.log(this.scroll)
     },
   },
 };
 </script>
 
 <style lang='scss' scoped>
-.rec {
+.rank {
   width: 100%;
   height: 100%;
-  overflow: scroll;
+  overflow: hidden;
   .bs {
     background: var(--bg-color);
     padding: 0.08rem 0.16rem;
@@ -74,11 +86,18 @@ export default {
 .title {
   padding: 0.08rem 0;
   position: relative;
+  font-size: 0.3rem;
+  color: #333;
+  font-weight: 600;
+  transform: translateX(0.05rem);
 }
 .song {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.off-ranks {
+  height: 8.76rem;
 }
 .off-item {
   box-shadow: 0 0 0.18rem 0.12rem #eee;
