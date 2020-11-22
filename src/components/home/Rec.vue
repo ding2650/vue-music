@@ -2,15 +2,25 @@
   <section class="rec" ref="content">
     <main class="bs" ref="bs">
       <Banner />
-      <Loading :show='loading' />
+      <Loading :show="loading" />
       <section class="body" :style="hideSty">
         <h5 class="vertical-line">推荐歌单</h5>
         <ul class="items">
-          <li class="item" v-for="(item, i) in recList" :key="'r' + i">
-            <img class="img" ref="image" :src="item.picUrl" alt="" />
+          <router-link
+            :to="`/playList/${item.id}`"
+            class="item"
+            v-for="(item, i) in recList"
+            :key="'r' + i"
+          >
+            <img
+              class="img"
+              ref="image"
+              :src="item.picUrl"
+              alt=""
+            />
             <p class="desc">{{ item.name }}</p>
             <span class="count">{{ formatCount(item.playCount) }}</span>
-          </li>
+          </router-link>
         </ul>
       </section>
     </main>
@@ -22,12 +32,13 @@ import BS from "better-scroll";
 import Swiper from "swiper";
 import Banner from "./components/Banner";
 import { recList } from "@api/server";
-import Loading from '../common/Loading'
+import Loading from "../common/Loading";
+import { formatCount } from '@tools/tools'
 export default {
   name: "Rec",
   components: {
     Banner,
-    Loading
+    Loading,
   },
   data() {
     return {
@@ -39,6 +50,7 @@ export default {
   },
   created() {
     this.getList();
+    console.log(this.formatCount)
   },
   mounted() {
     this.initScroll();
@@ -51,8 +63,21 @@ export default {
     },
   },
   methods: {
+    handlerPlayList (val) {
+    this.$router.push({
+      name:'PlayList',
+      // params:{
+      //   id:val.id
+      // }
+      query:{
+        id:val.id
+      }
+    })
+    },
     initScroll() {
-      this.scroll = new BS(this.$refs.content, {});
+      this.scroll = new BS(this.$refs.content, {
+        click:true
+      });
     },
     getList() {
       recList().then((res) => {
@@ -62,7 +87,7 @@ export default {
             item.onload = () => {
               this.count++;
               if (this.count === this.recList.length) {
-                this.loading = false
+                this.loading = false;
               }
             };
           });
@@ -70,9 +95,8 @@ export default {
         });
       });
     },
-    formatCount(num) {
-      return num < 10000 ? num :num>100000000?parseInt((num / 10000000))/10  + '亿' :parseInt(num / 10000) + "万";
-    },
+    formatCount
+   
   },
 };
 </script>
@@ -82,7 +106,8 @@ export default {
   width: 100%;
   height: 100%;
   overflow: scroll;
-  background: var(--color);
+  z-index: 1s;
+  // background: var(--color);
   .bs {
     background: white;
   }

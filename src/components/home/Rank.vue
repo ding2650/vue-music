@@ -15,14 +15,18 @@
           </section>
         </li>
       </ul>
-      <!-- 剩余榜单 -->
+      <!-- 全球榜单 -->
       <div class="vertical-line title" style="margin-top: 0.18rem">全球榜</div>
       <div class="body">
-        <section class=""></section>
+        <ul style="display: flex; flex-wrap: wrap">
+          <li class="item" v-for="(item, i) in allRanks" :key="'a' + i">
+            <img :src="item.coverImgUrl" ref="imgItem" alt="" />
+            <span class="update-msg">{{ item.updateFrequency }}</span>
+          </li>
+        </ul>
       </div>
     </div>
     <Loading :show="loading" />
-
   </div>
 </template>
 
@@ -57,14 +61,14 @@ export default {
           return n > 3;
         });
         this.$nextTick(() => {
-          this.initScroll();
           this.loading = false;
+          this.initScroll();
+        
         });
       });
     },
     initScroll() {
       this.scroll = new BS(this.$refs.content, {});
-      console.log(this.scroll)
     },
   },
 };
@@ -74,15 +78,15 @@ export default {
 .rank {
   width: 100%;
   height: 100%;
+  background: var(--bg-color);
   overflow: hidden;
+  z-index: 1;
   .bs {
     background: var(--bg-color);
     padding: 0.08rem 0.16rem;
   }
 }
-.body {
-  height: 800px;
-}
+
 .title {
   padding: 0.08rem 0;
   position: relative;
@@ -125,13 +129,29 @@ export default {
       width: 100%;
       height: 100%;
     }
-    .update-msg {
-      position: absolute;
-      bottom: 0.15rem;
-      left: 0.15rem;
-      color: white;
-      font-size: 0.24rem;
-    }
+  }
+}
+.update-msg {
+  position: absolute;
+  bottom: 0.15rem;
+  left: 0.15rem;
+  color: white;
+  font-size: 0.24rem;
+}
+.item {
+  position: relative;
+  width: 32.5%;
+  height: calc((100vw - 0.24rem) * 0.325);
+  margin-right: 1.25%;
+  margin-top: 0.16rem;
+  &:nth-child(3n) {
+    margin-right: 0;
+  }
+  img {
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
+    overflow: hidden;
   }
 }
 </style>

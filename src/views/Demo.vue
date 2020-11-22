@@ -3,58 +3,40 @@
     <section class="card">
       <div class="item">
         <div>参观场所</div>
-        <div class="gray">闸弄口站</div>
-        <div style="display: flex; align-items: center">
-          <van-icon
-            name="location"
-            color="#1a49c3"
-            size="24"
-            style="margin-right: 0.12rem"
-          />
-          导航
+        <div class="info">
+          <span style="color: #333"> 闸弄口站 </span>
+          <span class="nav">导航</span>
         </div>
-      </div>
-    </section>
-    <!-- 预约数据 -->
-    <section
-      class="card"
-      style="padding-bottom: 0.2rem"
-      v-for="(item, i) in mocklist"
-      :key="'m' + i"
-    >
-      <!-- <div> -->
-      <p class="tit">{{ item.title }}</p>
-      <div class="selects">
-        <div
-          class="foo"
-          :class="s.active ? 'active' : ''"
-          v-for="(s, index) in item.list"
-          :key="'s' + index"
-          @click="handlerClick(i, index)"
-        >
-          {{ s.value }}
-        </div>
-      </div>
-      <!-- </div> -->
-    </section>
-    <!-- 预约人数 -->
-    <section class="card" style="padding-bottom: 0.2rem">
-      <div class="item">
-        <span>预约人数</span>
-        <section class="count">
-          <span @click="handlerAddCount"></span>
-          <span>{{ params.preCount }}</span>
-          <span @click="handlerDecCount"></span>
-        </section>
       </div>
     </section>
 
-    <section class="card">
-      <div>
-        访客信息
-        <span class="info">（需要填写{{ params.preCount }}个游客信息）</span>
+    <!--  -->
+    <section class="card" v-for="(para, i) in pickers" :key="'p' + i">
+      <div class="item">
+        <div>{{ para.title }}</div>
+        <div class="pick" @click="handlerClick(i)">
+          <span class="font" v-if="params[para.key]"
+            >{{ params[para.key] }}
+          </span>
+          <span v-else>请输入</span>
+          <van-icon name="arrow" size="18" color="#ccc" />
+        </div>
+        <van-popup v-model="pickers[i].show" round position="bottom">
+          
+          <van-picker
+            show-toolbar
+            :title="para.title"
+            :columns="pickers[i].column"
+            @cancel="pickers[i].show = false"
+            @confirm="confirm(i, $event)"
+          >
+          </van-picker>
+
+        </van-popup>
       </div>
     </section>
+
+    <!--  -->
     <section class="card" v-for="(item, i) in forms" :key="'f' + i">
       <div class="inp">
         <span> 姓名：</span
@@ -97,65 +79,37 @@
 export default {
   data() {
     return {
-      mocklist: [
-        {
-          title: "预约日期",
-          list: [
-            {
-              value: "09-18",
-              active: false,
-            },
-            {
-              value: "09-19",
-              active: false,
-            },
-            {
-              value: "09-20",
-              active: false,
-            },
-            {
-              value: "更多",
-              disableActive: true,
-            },
-          ],
-        },
-        {
-          title: "选择场次",
-          list: [
-            {
-              value: "09:00-12:00",
-              active: false,
-            },
-            {
-              value: "12:00-17:00",
-              active: false,
-            },
-          ],
-        },
-        {
-          title: "参观团体",
-          list: [
-            {
-              value: "个人",
-              active: false,
-            },
-            {
-              value: "团体",
-              active: false,
-            },
-            {
-              value: "亲自",
-              active: false,
-            },
-          ],
-        },
-      ],
       loading: false,
       params: {
         preCount: 0,
         preDate: "",
         preRank: "",
         preType: "",
+      },
+
+      datePicker: {
+        show: false,
+        key: "preDate",
+        title: "请选择日期",
+        column: ["11-9", "11-10", "11-11"],
+      },
+      rankPicker: {
+        show: false,
+        key: "preRank",
+        title: "请选择场次",
+        column: ["场次1", "场次2", "场次3"],
+      },
+      countPicker: {
+        show: false,
+        key: "preCount",
+        title: "请选择人数",
+        column: [1, 2, 3],
+      },
+      comPicker: {
+        key: "preType",
+        show: false,
+        title: "请选择团体",
+        column: ["团体1", "团体2", "团体3"],
       },
       peoples: [],
     };
@@ -164,89 +118,82 @@ export default {
     forms() {
       return new Array(this.params.preCount);
     },
+    pickers() {
+      return [
+        this.datePicker,
+        this.rankPicker,
+        this.comPicker,
+        this.countPicker,
+      ];
+    },
   },
   methods: {
+    confirm(i, e) {
+      this.params[this.pickers[i].key] = e;
+      this.pickers[i].show = false;
+    },
+    handlerClick(i) {
+      this.pickers[i].show = true;
+      
+    },
     handlerPreBtnClick() {
-      let flag = true;
-      this.peoples.length = 0;
-      for (let i = 0; i < this.params.preCount; i++) {
-        const obj = {
+      let lgh = this.forms.length;
+      for (let i = 0; i < lgh; i++) {
+        this.peoples.push({
           name: this.$refs.name[i].value,
           idCard: this.$refs.idCard[i].value,
           tel: this.$refs.tel[i].value,
-        };
-        this.peoples.push(obj);
-      }
-      flag = this.peoples.reduce((cur, nex) => {
-        
-        return cur && this.checkInfo(nex);
-      }, true);
-      if (!flag) {
-        alert("请补充完整信息");
-        return;
-      }
-      //   所有人身份信息
-      console.log(this.peoples);
-      this.params.preDate =
-        this.mocklist[0].list.find((item) => item.active)?.value || null;
-      this.params.preRank =
-        this.mocklist[1].list.find((item) => item.active)?.value || null;
-      this.params.preType =
-        this.mocklist[2].list.find((item) => item.active)?.value || null;
-      // 日期、场次、团队信息
-      if (this.params.preDate && this.params.preRank && this.params.preType) {
-        //   这里调预约接口
-        // 信息放在this.params,身份信息在this.peoples里
-        //... some code
-        
-        console.log(this.params);
-        console.log(this.peoples);
-      } else {
-        alert("请填写完整信息");
-      }
-    },
-    checkInfo (target) {
-        // 对姓名，身份证，手机号校验
-        return Object.values(target).every(item=>item)
-    },
-    handlerAddCount() {
-      this.params.preCount++;
-    },
-    handlerDecCount() {
-      this.params.preCount =
-        this.params.preCount <= 0 ? 0 : this.params.preCount - 1;
-    },
-    handlerClick(i, index) {
-      const target = this.mocklist[i].list;
-      if (target[index].disableActive) {
-        //   点击更多
-      } else {
-        target.forEach((item, m) => {
-          item.active = m === index ? true : false;
         });
       }
+      console.log(this.peoples);
+      console.log(this.params)
     },
   },
 };
 </script>
 
-<style lang='scss' scoped>
+<style lang='scss' >
+// reset
+.van-picker-column__item--selected{
+  color: red;
+}
+.van-popup--bottom.van-popup--round{
+  border-radius: 20px;
+}
+// .van-picker-column__item{
+//   border-top: .01rem solid #ddd; 
+// }
+// end
 .place-container {
   background: #f0f0f4;
   padding: 0.08rem 0.28rem;
   font-size: 0.3rem;
   padding-bottom: 1.2rem;
+  color: #555;
   .card {
     display: flex;
     flex-direction: column;
     background: white;
     border-radius: 0.08rem;
     padding: 0.32rem 0.24rem;
-    margin-top: 0.15rem;
-    box-shadow: 0 0 0.12rem 0.05rem #e9e9f0;
+    margin-top: 0.02rem;
     .item {
       display: flex;
+      align-items: center;
       justify-content: space-between;
+    }
+  }
+  .pick {
+    display: flex;
+    align-items: center;
+    > span {
+      margin-right: 0.16rem;
+      font-size: 0.26rem;
+      color: #999;
+    }
+    .font {
+      font-size: 0.3rem;
+      color: #0e3ace;
     }
   }
   .btn {
@@ -270,63 +217,9 @@ export default {
     }
   }
 }
-.gray {
-  color: #999;
-}
-.foo {
-  padding: 0.08rem 0.32rem;
-  border-radius: 999px;
-  border: 1px solid #0e3ace;
-  color: #0e3ace;
-  margin-right: 0.18rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.tit {
-  margin-bottom: 0.12rem;
-  font-size: 0.32rem;
-}
-.selects {
-  display: flex;
-  flex-wrap: wrap;
-  .active {
-    background: #0e3ace;
-    color: white;
-  }
-}
-.count {
-  display: flex;
-  align-items: center;
-  font-size: 0.32rem;
-  > span {
-    margin-right: 0.18rem;
-    width: 0.5rem;
-    font-size: 0.42rem;
-    height: 0.5rem;
-    border: 1px solid #888;
-    border-radius: 50%;
-    &:nth-child(1) {
-      background: url(../assets/imgs/add.svg) no-repeat;
-      background-size: 80% 80%;
-      background-position: 0.05rem 0.05rem;
-    }
-    &:nth-child(2) {
-      transform: scale(1.36);
-      width: auto;
-      background: transparent;
-      height: auto;
-      border: none;
-    }
-    &:nth-child(3) {
-      background: url(../assets/imgs/dec.svg) no-repeat;
-      background-size: 80% 80%;
-      background-position: 0.05rem 0.05rem;
-    }
-  }
-}
+
 .info {
-  font-size: 0.28rem;
+  font-size: 0.26rem;
   color: #999;
   margin-left: 0.05rem;
 }
@@ -335,6 +228,7 @@ export default {
   > span {
     width: 1.5rem;
   }
+
   .input {
     padding: 0.05rem;
     border: 1px solid transparent;
@@ -342,5 +236,13 @@ export default {
       color: #ccc;
     }
   }
+}
+.nav {
+  border-radius: 99px;
+  margin-left: 8px;
+  padding: 5px 12px;
+  font-size: 12px;
+  background: #44cef6;
+  color: white;
 }
 </style>

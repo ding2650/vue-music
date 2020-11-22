@@ -52,7 +52,6 @@ export default {
 <style lang='scss' scoped>
 .swiper-container {
   height: 3.24rem;
-  background: lightcoral;
   border-radius: 0.08rem;
   overflow: hidden;
 }

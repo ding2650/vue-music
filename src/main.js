@@ -12,7 +12,6 @@ import 'vant/lib/index.css';
 import 'swiper/css/swiper.css'
 
 Vue.use(Vant);
-
 // 自定义文件引入
 import  './assets/css/reset.css'
 import  './assets/icons/iconfont.css'

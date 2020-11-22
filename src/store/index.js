@@ -10,16 +10,20 @@ export default new Vuex.Store({
       imgUrl: "",
       name: "",
       artist: "",
-      gcIndex:0,
+      gcIndex: 0,
       playUrl: "",
       duration: 0,
       currentTime: 0,
-      isPlay:'',
-      index:0,
-      fixShow:false,
+      isPlay: '',
+      index: 0,
+      fixShow: false,
     },
-    audio:{},
-    songsList:[]
+    animationStatus: {
+      mode: 'in-out',
+      name: 'in'
+    },
+    audio: {},
+    songsList: []
   },
   mutations: {
     // 设置歌曲信息

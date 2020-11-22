@@ -1,9 +1,11 @@
 <template>
-  <div class="home">
+  <div class="home fix">
     <header>
       <van-icon name="wap-nav" size="26" />
       <span> Music </span>
-      <van-icon name="search" size="26" />
+      <router-link to="/search">
+        <van-icon name="search" size="26" />
+      </router-link>
     </header>
     <nav style="position: relative">
       <div
@@ -21,9 +23,11 @@
         {{ navsArr[activeIndex].msg }}
       </div>
     </nav>
-    <div class="home-container" >
+    <div class="home-container">
       <keep-alive>
-      <router-view class="type" ref='type' />
+        <!-- <transition :name="deriction" mode="in-out"> -->
+          <router-view class="type" ref="type" />
+        <!-- </transition> -->
       </keep-alive>
     </div>
   </div>
@@ -44,13 +48,14 @@ export default {
         { msg: "排行榜", to: "/home/rank" },
       ],
       activeIndex: 0,
+      deriction: "fromLeft",
     };
   },
   mounted() {
-    setTimeout(()=>{
-      this.setLine()
-    },0)
-},
+    setTimeout(() => {
+      this.setLine();
+    }, 0);
+  },
   methods: {
     // 横条left
     setLine() {
@@ -76,8 +81,8 @@ export default {
   flex-direction: column;
   .home-container {
     position: absolute;
-    background: --bg-color;
-    top: 1.92rem;
+    background: linear-gradient(to Top,white 50%,var(--color) 50%);
+    top: 2.15rem;
     left: 0;
     right: 0;
     bottom: 0;
@@ -119,4 +124,6 @@ export default {
     background: linear-gradient(to right, white, #eee);
   }
 }
+
+
 </style>

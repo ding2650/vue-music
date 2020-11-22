@@ -55,14 +55,14 @@ export default {
       letterIndex: -1,
       requsetParams: {
         // 歌手类型
-        type: '',
-        area: '',
+        type: "",
+        area: "",
         // 首字母
         initial: "",
         // 偏移量
         offset: 0,
       },
-      singerScroll:null,
+      singerScroll: null,
       letterList: [
         {
           label: "A",
@@ -291,8 +291,8 @@ export default {
         this.typeIndex === -1
           ? {
               ...this.requsetParams,
-              type: '',
-              area: '', 
+              type: "",
+              area: "",
             }
           : {
               ...this.requsetParams,
@@ -316,20 +316,20 @@ export default {
         click: true,
       });
     },
-    // 
-    setSingerScroll () {
-      this.singerScroll = new BS(this.$refs.content,{
-        click:true
-      })
+    //
+    setSingerScroll() {
+      this.singerScroll = new BS(this.$refs.content, {
+        click: true,
+      });
     },
     getList() {
       // loading
       artList(this.requsetParams).then((res) => {
         console.log(res);
         this.singerList = res.data.artists;
-        this.$nextTick(()=>{
-        this.setSingerScroll()
-        })
+        this.$nextTick(() => {
+          this.setSingerScroll();
+        });
       });
     },
   },
@@ -339,6 +339,9 @@ export default {
 <style lang='scss' scoped>
 .singer-container {
   padding: 0.08rem 0;
+  background: var(--bg-color);
+  z-index: 1;
+
   .types {
     width: 100vw;
     height: 0.42rem;
@@ -369,18 +372,18 @@ export default {
 }
 .fix-singer {
   position: fixed;
-  top: 3.1rem;
+  top: 3.3rem;
   left: 0;
   right: 0;
   background: white;
   padding: 0.12rem;
   height: calc(100vh - 3.1rem);
   overflow: hidden;
-  .bs{
-    padding: .12rem 0;
-    padding-bottom: .36rem;
+  .bs {
+    padding: 0.12rem 0;
+    padding-bottom: 0.36rem;
   }
-.card {
+  .card {
     margin: 0 0.012rem;
     border-radius: 0.08rem;
     padding: 0.12rem;

@@ -1,6 +1,10 @@
 <template>
   <div id="app">
-    <router-view />
+    <transition :name="animationStatus.name" :mode="animationStatus.mode">
+      <keep-alive>
+        <router-view />
+      </keep-alive>
+    </transition>
 
     <!-- 固定底部歌曲播放器 -->
     <transition name="fade">
@@ -33,11 +37,24 @@
 <script>
 import { mapMutations, mapState } from "vuex";
 export default {
-  computed: {
-    ...mapState(["songInfo", "songsList"]),
+  data() {
+    return {};
   },
-  mounted () {
-    this.setSongInfo({audio:this.$refs.audio})
+  computed: {
+    ...mapState(["songInfo", "songsList", "animationStatus"]),
+  },
+  mounted() {
+    this.setSongInfo({ audio: this.$refs.audio });
+  },
+  watch: {
+    $route(to, from) {
+      if (to.name === "Search") {
+        this.mode = "in-out";
+      }
+      if (from.name === "Search") {
+        this.mode = "out-in";
+      }
+    },
   },
   methods: {
     ...mapMutations(["setSongInfo"]),
@@ -50,7 +67,7 @@ export default {
   },
 };
 </script>>
-<style lang="scss" scoped>
+<style lang="scss" >
 .fix-play {
   position: fixed;
   z-index: 999;
@@ -83,12 +100,31 @@ export default {
     }
   }
 }
-.fade-enter,
-.fade-leave-to {
-  transform: translateY(100%);
+.in-enter {
+  transform: translateX(100%) rotateZ(90deg);
 }
-.fade-enter-active,
-.fade-leave-active {
-  transition: all 0.36s ease-in-out;
+.in-leave-to {
+  transform: translateX(100%) rotateZ(90deg);
+}
+.out-enter {
+  transform: translate(0, 0, 0);
+}
+.out-leave-to {
+  transform: translateX(100%) rotateZ(90deg);
+}
+
+.in-enter-active,
+.in-leave-active,
+.out-leave-active {
+  transition: all 0.42s ease-out;
+  transform-origin: 100% 100%;
+}
+.fix {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  min-height: 100vh;
+  background: white;
 }
 </style>

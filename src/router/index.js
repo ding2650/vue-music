@@ -33,6 +33,16 @@ const routes = [
     ]
   },
   {
+    path:'/search',
+    name:'Search',
+    component: ()=> import('../views/Search')
+  },
+  {
+    path:'/playList/:id',
+    name:'PlayList',
+    component: ()=> import('../views/PlayList')
+  },
+  {
     path: '/play',
     name: 'Play',
     component: () => import('../views/Play')
