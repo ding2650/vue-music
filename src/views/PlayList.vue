@@ -17,9 +17,9 @@
           <section class="right">
             <p class="title">{{ infos.name }}</p>
             <div class="author">
-              <img class="img" :src="infos.creator.avatarUrl" alt="" />
+              <img class="img" :src="infos.creator&&infos.creator.avatarUrl" alt="" />
               <span class="bar">
-                {{ infos.creator.nickname }}
+                {{infos.creator&& infos.creator.nickname }}
               </span>
             </div>
           </section>
