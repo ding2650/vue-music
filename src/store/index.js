@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 
 Vue.use(Vuex)
-
+import { song, songDetail, lyric, album } from "../server/server";
 export default new Vuex.Store({
   state: {
     songInfo: {
@@ -16,7 +16,7 @@ export default new Vuex.Store({
       currentTime: 0,
       isPlay: '',
       index: 0,
-      fixShow: false,
+      fixShow: true,
     },
     animationStatus: {
       mode: 'in-out',
@@ -47,6 +47,11 @@ export default new Vuex.Store({
     // 
   },
   actions: {
+    // 获取歌曲信息
+    async getSong({ commit }, payload) {
+      let res =  await song(payload)
+      console.log(res)
+    }
   },
   modules: {
   }

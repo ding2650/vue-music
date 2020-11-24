@@ -6,11 +6,11 @@ const server = axios.create({
 })
 
 // 通过id获取歌曲播放地址
-export const song = (params = { id: 33894312 }) => {
+export const song = (params) => {
     return server.get('/song/url', { params })
 }
 // 通过id获取歌曲歌词
-export const lyric = (params = { id: 33894312 }) => {
+export const lyric = (params) => {
     return server.get('/lyric', { params })
 }
 // 通过id获取歌曲封面
@@ -18,10 +18,10 @@ export const lyric = (params = { id: 33894312 }) => {
 //     return server.get('/lyric',{params})
 // }
 // 通过id获取歌曲详情
-export const songDetail = (params = { ids: 33894312 }) => {
+export const songDetail = (params ) => {
     return server.get('/song/detail', { params })
 }
-export const album = (params = { id: 32311 }) => {
+export const album = (params ) => {
     return server.get('/album', { params })
 }
 

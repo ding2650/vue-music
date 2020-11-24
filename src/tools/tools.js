@@ -11,6 +11,6 @@ export const formatCount = count => {
     return count < 10000
         ? count
         : count > 100000000
-            ? parseInt(count / 10000000) / 10 + "亿"
-            : parseInt(count / 10000) + "万";
+            ? parseInt(count / 10000000) / 10 + " 亿"
+            : parseInt(count / 10000) + " 万";
 }

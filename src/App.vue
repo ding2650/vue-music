@@ -8,14 +8,16 @@
 
     <!-- 固定底部歌曲播放器 -->
     <transition name="fade">
-      <section class="fix-play" v-if="false">
+      <section class="fix-play" v-if="songInfo.fixShow">
         <div>
-          <img class="img" :src="songInfo.imgUrl" alt="" />
+          <img  class="img" :src="songInfo.imgUrl" alt="" />
         </div>
-        <div class="info">
+        
+        <div class="info" >
           <p>{{ songInfo.name }}</p>
           <p>{{ songInfo.artist }}</p>
         </div>
+        
         <div style="margin: 0 2vw">
           <van-icon
             name="pause-circle-o"

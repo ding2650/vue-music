@@ -1,6 +1,6 @@
 <template>
-  <section class="playList-container fix">
-    <main ref="bs" v-height>
+  <section class="playList-container fix" ref="bs">
+    <main>
       <div class="header">
         <div class="bg">
           <img class="bg-img" :src="infos.coverImgUrl" alt="" />
@@ -57,18 +57,18 @@
               name="play-circle-o"
               size=".5rem"
             />
-            播放全部<span class="span">(共3首)</span>
+            播放全部<span class="span">(共{{list.length}}首)</span>
           </section>
           <section class="list-right">
             <van-icon name="plus" style="margin-right: 0.08rem" size=".36rem" />
-            收藏（0.8）万
+            收藏 {{formatCount(infos.subscribedCount)}}
           </section>
         </header>
         <ul class="songs">
-          <li class="songs-item" v-for="(item, i) in list" :key="i">
+          <li class="songs-item" v-for="(item, i) in list" :key="i" @click="createAnimate(item)">
             <div class="order">{{ i + 1 }}</div>
             <div class="info">
-              <p class="titel">{{ item.name }}</p>
+              <p class="tit">{{ item.name }}</p>
               <p class="singer">
                 {{ formatAuthor(item.ar) + "-" + item.al.name }}
               </p>
@@ -77,6 +77,9 @@
         </ul>
       </div>
     </main>
+    <span class="song-animate">
+      <van-icon class="like" name="like" color="#f47983" size=".52rem"/>
+    </span>
   </section>
 </template>
 
@@ -85,36 +88,33 @@ import Back from "@com/common/Back";
 import { formatCount } from "@tools/tools";
 import { playList } from "@api/server";
 import BS from "better-scroll";
+import { mapActions } from 'vuex';
 export default {
   components: {
     Back,
   },
-  directives:{
-    'height':{
-      bind(el){
-        setTimeout(() => {
-         const dom = document.getElementsByClassName('songs')[0]
-         console.dir(dom)
 
-        }, 0);
-        
-      },
-    }
-  },
   data() {
     return {
       infos: {},
       list: [],
-      scroll:null
+      scroll: null,
     };
   },
-  mounted() {
-    this.initScoll()
-  },
+
   methods: {
-    initScoll () {
-      this.scroll = new BS(this.$refs.bs)
-      console.log(this.scroll)
+    ...mapActions(['getSong']),
+    createAnimate ({id}) {
+      // 设置动画
+      this.getSong({id})
+    },
+    initScoll() {
+      this.scroll = new BS(this.$refs.bs, {
+        startY: true,
+        click: true,
+        bounce: false
+      });
+      console.log(this.scroll);
     },
     formatAuthor(arr) {
       if (arr.length === 1) return arr[0].name;
@@ -126,6 +126,11 @@ export default {
       playList({ id: this.$route.params.id }).then((res) => {
         this.infos = res.data.playlist;
         this.list = res.data.playlist.tracks;
+        setTimeout(() => {
+          this.$nextTick(() => {
+            this.initScoll();
+          });
+        }, 320);
       });
     },
     formatCount,
@@ -138,6 +143,44 @@ export default {
 </script>
 
 <style lang='scss' scoped>
+.song-animate{
+  position: fixed;
+  top: 50%;
+  right: 45%;
+  z-index: 99;
+  animation: dance 1.2s linear ;
+}
+.like{
+  position: absolute;
+  top: 50%;
+  right: 45%;
+  z-index: 99;
+  animation: bar 1.2s cubic-bezier(.55,0,.85,.36) ;
+}
+@keyframes bar {
+
+  100%{
+    transform: translateY(calc(50vh - 1.2rem));
+  }
+}
+@keyframes dance {
+  // 5%{
+  //   transform: translateY(100%);
+  // }
+  // 15%{
+  //   transform: translateY(-100%);
+  // }
+ 
+  100%{
+    transform: translateX(-3rem);
+  }
+}
+.tit {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: calc(100vw - 2rem);
+}
 .songs-item {
   display: flex;
   align-items: center;
@@ -152,7 +195,7 @@ export default {
       color: #999;
       margin-top: 0.05rem;
       font-size: 0.32rem;
-      max-width: calc(100vw - 1.56rem);
+      max-width: calc(100vw - 1.76rem);
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
@@ -162,14 +205,16 @@ export default {
 .playList-container {
   z-index: 9;
   background: var(--bg);
+  height: 100vh;
+  overflow: hidden;
 }
 .list {
   border-radius: 0.28rem;
   background: white;
   transform: translateY(-0.28rem);
-  position: absolute;
-  width: 100%;
-  z-index: 99;
+  // position: absolute;
+  // width: 100%;
+  // z-index: 99;
   .header {
     display: flex;
     align-items: center;
@@ -210,7 +255,7 @@ export default {
   height: 5.88rem;
   .bg {
     position: absolute;
-    z-index: 1;
+    z-index: -1;
     top: 0;
     left: 0;
     right: 0;
