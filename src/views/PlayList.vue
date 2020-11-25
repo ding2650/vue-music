@@ -1,6 +1,6 @@
 <template>
   <section class="playList-container fix" ref="bs">
-    <main>
+    <main style="padding-bottom:.96rem">
       <div class="header">
         <div class="bg">
           <img class="bg-img" :src="infos.coverImgUrl" alt="" />
@@ -65,7 +65,7 @@
           </section>
         </header>
         <ul class="songs">
-          <li class="songs-item" v-for="(item, i) in list" :key="i" @click="createAnimate(item)">
+          <li class="songs-item" v-for="(item, i) in list" :key="i" @click="createAnimate($event,item,i)">
             <div class="order">{{ i + 1 }}</div>
             <div class="info">
               <p class="tit">{{ item.name }}</p>
@@ -77,7 +77,7 @@
         </ul>
       </div>
     </main>
-    <span class="song-animate">
+    <span class="song-animate" @animationend='show = false'  v-if="show" :style="`top:${top}px;left:${left}px`">
       <van-icon class="like" name="like" color="#f47983" size=".52rem"/>
     </span>
   </section>
@@ -88,7 +88,7 @@ import Back from "@com/common/Back";
 import { formatCount } from "@tools/tools";
 import { playList } from "@api/server";
 import BS from "better-scroll";
-import { mapActions } from 'vuex';
+import { mapActions, mapMutations } from 'vuex';
 export default {
   components: {
     Back,
@@ -99,13 +99,27 @@ export default {
       infos: {},
       list: [],
       scroll: null,
+      show:false,
+      top:0,
+      left:0
     };
   },
 
   methods: {
-    ...mapActions(['getSong']),
-    createAnimate ({id}) {
+    ...mapActions(['getSong','getSong']),
+    ...mapMutations(['setSongInfo']),
+    createAnimate (e,{id},i) {
       // 设置动画
+      this.top = e.clientY
+      this.left = e.clientX
+      this.show = true
+      console.log(this.list[i])
+      this.setSongInfo({
+        imgUrl:this.list[i].al.picUrl,
+        name:this.list[i].name,
+        artist:this.formatAuthor(this.list[i].ar) 
+
+      })
       this.getSong({id})
     },
     initScoll() {
@@ -145,34 +159,41 @@ export default {
 <style lang='scss' scoped>
 .song-animate{
   position: fixed;
-  top: 50%;
-  right: 45%;
+  // top: 50%;
+  // right: 45%;
   z-index: 99;
-  animation: dance 1.2s linear ;
+  animation: hor 1s linear ;
 }
 .like{
   position: absolute;
-  top: 50%;
-  right: 45%;
+  top: 0;
+  left: 0;
   z-index: 99;
-  animation: bar 1.2s cubic-bezier(.55,0,.85,.36) ;
+  animation: via 1s  ease-in-out ;
 }
-@keyframes bar {
-
+@keyframes via {
+  // 10%{
+  //   transform: translateY(10px);
+  // }
+  // 20%{
+  //   transform: translateY(-30px);
+  // }
   100%{
-    transform: translateY(calc(50vh - 1.2rem));
+    top:calc(100vh - 3rem );
   }
 }
-@keyframes dance {
+@keyframes hor {
+  // 水平
   // 5%{
   //   transform: translateY(100%);
   // }
-  // 15%{
-  //   transform: translateY(-100%);
+  // 20%{
+  //   transform: translateX(0);
   // }
  
   100%{
-    transform: translateX(-3rem);
+    left:50%;
+    transform: translateX(-50%);
   }
 }
 .tit {
@@ -209,7 +230,7 @@ export default {
   overflow: hidden;
 }
 .list {
-  border-radius: 0.28rem;
+  border-radius: 0.28rem .28rem 0 0;
   background: white;
   transform: translateY(-0.28rem);
   // position: absolute;

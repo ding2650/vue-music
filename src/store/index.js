@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 
 Vue.use(Vuex)
-import { song, songDetail, lyric, album } from "../server/server";
+import { song, songDetail, lyric, album, getSongInfo } from "../server/server";
 export default new Vuex.Store({
   state: {
     songInfo: {
@@ -49,7 +49,13 @@ export default new Vuex.Store({
   actions: {
     // 获取歌曲信息
     async getSong({ commit }, payload) {
-      let res =  await song(payload)
+      let res = await song(payload)
+      commit('setSongInfo',{
+        playUrl:res.data.data[0].url
+      })
+    },
+    async songDetail({ commit }, payload) {
+      const res = getSongInfo(payload)
       console.log(res)
     }
   },

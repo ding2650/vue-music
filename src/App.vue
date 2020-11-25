@@ -92,12 +92,17 @@ export default {
     display: flex;
     flex-direction: column;
     flex: 1;
-    margin: 0 5vw;
+    margin-left: 5vw;
     justify-content: space-around;
     p {
       margin: 0.05rem 0;
+      width:calc(93vw - 3rem);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
       &:last-child {
         color: #888;
+       
       }
     }
   }

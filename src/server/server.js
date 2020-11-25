@@ -13,6 +13,7 @@ export const song = (params) => {
 export const lyric = (params) => {
     return server.get('/lyric', { params })
 }
+
 // 通过id获取歌曲封面
 // export const playOneSong = (params={id:33894312}) =>{
 //     return server.get('/lyric',{params})
@@ -23,6 +24,10 @@ export const songDetail = (params ) => {
 }
 export const album = (params ) => {
     return server.get('/album', { params })
+}
+export const getSongInfo = (params)=>{
+    const arr = [song(params),lyric(params),album(params)]
+    return Promise.all(arr)
 }
 
 // 轮播图
