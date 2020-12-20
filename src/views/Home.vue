@@ -23,7 +23,7 @@
         {{ navsArr[activeIndex].msg }}
       </div>
     </nav>
-    <div class="home-container">
+    <div class="home-container" >
       <keep-alive>
         <!-- <transition :name="deriction" mode="in-out"> -->
           <router-view class="type" ref="type" />
@@ -36,6 +36,7 @@
 <script>
 // import Banner from "@com/home/Banner";
 import BS from "better-scroll";
+import { mapState } from 'vuex';
 
 export default {
   name: "Home",
@@ -50,6 +51,9 @@ export default {
       activeIndex: 0,
       deriction: "fromLeft",
     };
+  },
+  computed :{
+    ...mapState(['fixShow'])
   },
   mounted() {
     setTimeout(() => {

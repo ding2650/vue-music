@@ -14,10 +14,13 @@ export default new Vuex.Store({
       playUrl: "",
       duration: 0,
       currentTime: 0,
-      isPlay: '',
+      isPlay: false,
       index: 0,
-      fixShow: true,
+      angle: 0,
+      speed: 1,
     },
+    curIndex: 0,
+    fixShow: false,
     animationStatus: {
       mode: 'in-out',
       name: 'in'
@@ -28,18 +31,39 @@ export default new Vuex.Store({
   mutations: {
     // 设置歌曲信息
     setSongInfo(state, payload) {
-      state.songInfo = {
+      state.songInfo = payload.playUrl ? {
         ...state.songInfo,
         ...payload
+      } : Object.assign(state.songInfo, payload)
+
+    },
+    setFixShow(state) {
+      state.fixShow = true
+    },
+    // 
+    pushSongInfo(state) {
+
+      console.log('push', state.songInfo.name)
+      state.songsList.push({
+        ...state.songInfo
+      })
+      state.curIndex = state.songsList.length - 1
+
+    },
+    updateSongList({ songsList, curIndex, songInfo }) {
+      songsList[curIndex] = {
+        ...songInfo
       }
     },
-    //设置歌曲对象的某些状态
-    setAudioInfo(state, payload) {
-      state.audio = {
-        ...state.audio,
-        ...payload
-      }
-    }
+
+    // 播放结束下一首，
+    playNext(state) {
+      console.log(state.songsList.map(item => item.name))
+      state.curIndex++
+      state.curIndex = state.curIndex % state.songsList.length
+      state.songInfo = state.songsList[state.curIndex]
+
+    },
     // 操作当前播放列表
     // 增加
     // 删除
@@ -48,16 +72,29 @@ export default new Vuex.Store({
   },
   actions: {
     // 获取歌曲信息
-    async getSong({ commit }, payload) {
-      let res = await song(payload)
-      commit('setSongInfo',{
-        playUrl:res.data.data[0].url
+    async getSong({ commit, dispatch, state }, payload) {
+      const target = state.songsList.findIndex(item => {
+        return item.id === payload.id
       })
+      if (target !== -1) {
+        commit('setSongInfo', {
+          ...state.songsList[target]
+        })
+        return
+      }
+      commit('pushSongInfo')
+      let res = await song(payload)
+      commit('setSongInfo', {
+        playUrl: res.data.data[0].url,
+      })
+      commit('updateSongList')
+      dispatch('songDetail', payload)
+
     },
-    async songDetail({ commit }, payload) {
-      const res = getSongInfo(payload)
-      console.log(res)
-    }
+    // async songDetail({ commit }, payload) {
+    //   const res = await getSongInfo(payload)
+    //   console.log(res)
+    // }
   },
   modules: {
   }

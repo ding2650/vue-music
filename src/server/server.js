@@ -22,11 +22,11 @@ export const lyric = (params) => {
 export const songDetail = (params ) => {
     return server.get('/song/detail', { params })
 }
-export const album = (params ) => {
-    return server.get('/album', { params })
-}
+// export const album = (params ) => {
+//     return server.get('/album', { params })
+// }
 export const getSongInfo = (params)=>{
-    const arr = [song(params),lyric(params),album(params)]
+    const arr = [song(params),lyric(params)]
     return Promise.all(arr)
 }
 

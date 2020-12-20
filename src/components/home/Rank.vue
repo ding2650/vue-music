@@ -3,7 +3,7 @@
     <div class="bs" ref="bs">
       <div class="vertical-line title">官方榜</div>
       <ul class="off-ranks">
-        <li class="off-item" v-for="(item, i) in topRanks" :key="'t' + i">
+        <router-link :to="'/playList/'+item.id" class="off-item" v-for="(item, i) in topRanks" :key="'t' + i" @click="linkPlayList(item)">
           <div class="img-wrap">
             <img class="off-img" :src="item.coverImgUrl" alt="" />
             <span class="update-msg"> {{ item.updateFrequency }} </span>
@@ -13,16 +13,16 @@
               {{ i + 1 }}、{{ detail.first }}-{{ detail.second }}
             </p>
           </section>
-        </li>
+        </router-link>
       </ul>
       <!-- 全球榜单 -->
       <div class="vertical-line title" style="margin-top: 0.18rem">全球榜</div>
       <div class="body">
         <ul style="display: flex; flex-wrap: wrap">
-          <li class="item" v-for="(item, i) in allRanks" :key="'a' + i">
+          <router-link :to="'/playList/'+item.id"  class="item" v-for="(item, i) in allRanks" :key="'a' + i">
             <img :src="item.coverImgUrl" ref="imgItem" alt="" />
             <span class="update-msg">{{ item.updateFrequency }}</span>
-          </li>
+          </router-link>
         </ul>
       </div>
     </div>
@@ -67,8 +67,14 @@ export default {
         });
       });
     },
+    linkPlayList({id}){
+      console.log(11)
+      console.log(id)
+    },
     initScroll() {
-      this.scroll = new BS(this.$refs.content, {});
+      this.scroll = new BS(this.$refs.content, {
+        click:true
+      });
     },
   },
 };
@@ -101,15 +107,16 @@ export default {
   text-overflow: ellipsis;
 }
 .off-ranks {
-  height: 8.76rem;
+  height: 9.46rem;
 }
 .off-item {
   box-shadow: 0 0 0.18rem 0.12rem #eee;
   background: white;
   border-radius: 0.08rem;
   display: flex;
-  height: 1.98rem;
-  padding: 0.12rem;
+  height: 1.78rem;
+  padding: 0.24rem;
+  margin-bottom: .12rem;
   .off-info {
     display: flex;
     flex-direction: column;

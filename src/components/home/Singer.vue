@@ -29,7 +29,7 @@
       </section>
     </div>
     <div class="fix-singer" ref="content">
-      <ul class="bs" ref="bs">
+      <ul class="bs " ref="bs">
         <li class="card" v-for="(singer, i) in singerList" :key="'s' + i">
           <div class="avatar">
             <img :src="singer.picUrl" alt="" />
@@ -381,7 +381,7 @@ export default {
   overflow: hidden;
   .bs {
     padding: 0.12rem 0;
-    padding-bottom: 0.36rem;
+    padding-bottom: 1.66rem;
   }
   .card {
     margin: 0 0.012rem;

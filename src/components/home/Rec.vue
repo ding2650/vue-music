@@ -1,6 +1,6 @@
 <template>
   <section class="rec" ref="content">
-    <main class="bs" ref="bs">
+    <main class="bs" ref="bs" >
       <Banner />
       <Loading :show="loading" />
       <section class="body" :style="hideSty">
@@ -34,6 +34,7 @@ import Banner from "./components/Banner";
 import { recList } from "@api/server";
 import Loading from "../common/Loading";
 import { formatCount } from '@tools/tools'
+import { mapState } from 'vuex';
 export default {
   name: "Rec",
   components: {
@@ -50,12 +51,15 @@ export default {
   },
   created() {
     this.getList();
-    console.log(this.formatCount)
   },
   mounted() {
     this.initScroll();
   },
+  activated (){
+    this.initScroll()
+  },
   computed: {
+    ...mapState(['fixShow']),
     hideSty() {
       return `
       opacity:${this.loading ? 0 : 1}

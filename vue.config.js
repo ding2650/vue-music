@@ -6,7 +6,7 @@ const resolve = dir => {
 module.exports = {
     chainWebpack: config => {
         config.resolve.alias
-            .set('@api', resolve('src/server')) // key,value自行定义，比如.set('@@', resolve('src/components'))
+            .set('@api', resolve('src/server')) 
             .set('@com', resolve('src/components'))
             .set('@tools', resolve('src/tools'))
             .set('@views', resolve('src/views'))

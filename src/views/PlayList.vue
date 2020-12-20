@@ -1,6 +1,6 @@
 <template>
   <section class="playList-container fix" ref="bs">
-    <main style="padding-bottom:.96rem">
+    <main :class="fixShow?'padding-bot':''">
       <div class="header">
         <div class="bg">
           <img class="bg-img" :src="infos.coverImgUrl" alt="" />
@@ -74,12 +74,15 @@
               </p>
             </div>
           </li>
+            <li style="height:.96rem"></li>
+
         </ul>
       </div>
     </main>
     <span class="song-animate" @animationend='show = false'  v-if="show" :style="`top:${top}px;left:${left}px`">
       <van-icon class="like" name="like" color="#f47983" size=".52rem"/>
     </span>
+    
   </section>
 </template>
 
@@ -88,7 +91,7 @@ import Back from "@com/common/Back";
 import { formatCount } from "@tools/tools";
 import { playList } from "@api/server";
 import BS from "better-scroll";
-import { mapActions, mapMutations } from 'vuex';
+import { mapActions, mapMutations, mapState } from 'vuex';
 export default {
   components: {
     Back,
@@ -104,23 +107,27 @@ export default {
       left:0
     };
   },
-
+  computed:{
+    ...mapState(['fixShow'])
+  },
   methods: {
-    ...mapActions(['getSong','getSong']),
-    ...mapMutations(['setSongInfo']),
+    ...mapActions(['getSong']),
+    ...mapMutations(['setSongInfo','pushSong','setFixShow']),
     createAnimate (e,{id},i) {
       // 设置动画
       this.top = e.clientY
       this.left = e.clientX
       this.show = true
-      console.log(this.list[i])
       this.setSongInfo({
         imgUrl:this.list[i].al.picUrl,
         name:this.list[i].name,
-        artist:this.formatAuthor(this.list[i].ar) 
-
+        artist:this.formatAuthor(this.list[i].ar),
+        isPlay:true,
+        id
       })
+      this.setFixShow()
       this.getSong({id})
+
     },
     initScoll() {
       this.scroll = new BS(this.$refs.bs, {
@@ -128,7 +135,6 @@ export default {
         click: true,
         bounce: false
       });
-      console.log(this.scroll);
     },
     formatAuthor(arr) {
       if (arr.length === 1) return arr[0].name;
@@ -201,6 +207,9 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   width: calc(100vw - 2rem);
+}
+.padding-bot{
+  padding-bottom: .96rem;
 }
 .songs-item {
   display: flex;

@@ -94,7 +94,6 @@
 
 <script>
 import { formatMinutes } from "../tools/tools";
-import Swiper from "swiper";
 import { song, songDetail, lyric, album } from "../server/server";
 import { mapMutations, mapState } from "vuex";
 export default {
@@ -141,29 +140,7 @@ export default {
       );
       this.gcHeight = parentHeight / 2;
     },
-    // 初始化swiper
-    initSwiper() {
-      // const el = this.$refs.slider;
-      // this.slider = new Swiper(el, {
-      //    // init:false,
-      //   //  initialSlide: 1,
-      //     direction: "vertical", // 垂直切换选项
-      //     loop: true, // 循环模式选项
-      //     speed: 500,
-      //     slidesPerView: 2,
-      //     allowTouchMove:false,
-      //     on:{
-      //       slideChange:()=>{
-      //         this.gcIndx = this.slider?.activeIndex || 1
-      //       }
-      //     },
-      //     autoplay:{
-      //       delay:this.curDalay
-      //     },
-      //     observer: true, //修改swiper自己或子元素时，自动初始化swiper
-      //     observeParents: false, //修改swiper的父元素时，自动初始化swiper
-      // });
-    },
+   
     // 返回上一级
     back() {
       // console.log(this.songInfo)
@@ -174,7 +151,6 @@ export default {
         currentTime:this.audio.currentTime,
         isPlay:this.isPlay
       })
-      console.log(this.songInfo)
       this.$router.back();
     },
     // 改变播放速度
@@ -299,6 +275,7 @@ export default {
   bottom: 0;
   left: 0;
   right: 0;
+  z-index: 99;
   display: flex;
   flex-direction: column;
   .bg {
