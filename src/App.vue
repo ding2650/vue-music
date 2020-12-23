@@ -9,7 +9,7 @@
     <!-- 固定底部歌曲播放器 -->
     <transition name="fade">
       <section class="fix-play" v-if="fixShow">
-        <button @click="demo">btn</button>
+        <!-- <button @click="demo">btn</button> -->
 
         <div>
           <img
@@ -24,18 +24,12 @@
           <p>{{ songInfo.name }}</p>
           <p>{{ songInfo.artist }}</p>
         </div>
-        <div></div>
-        <div style="margin: 0 2vw">
-          <van-icon
-            name="pause-circle-o"
-            size="0.8rem"
-            @click="pause"
-            v-if="songInfo.isPlay"
-          />
-          <van-icon name="play-circle-o" size="0.8rem" v-else @click="play" />
+      {{songInfo.duration}}
+        <div style="margin: 0 4vw 0 2vw">
+          <StepBar ref='percentBar' @pause="pause" @play="play"> </StepBar>
         </div>
         <div>
-          <i class="iconfont icon-bofangliebiao" style="font-size: 0.8rem"></i>
+          <i class="iconfont icon-bofangliebiao"  style="font-size: 0.68rem;color:var(--color)"></i>
         </div>
       </section>
     </transition>
@@ -50,7 +44,11 @@
 
 <script>
 import { mapMutations, mapState } from "vuex";
+import StepBar from "./components/common/StepBar";
 export default {
+  components: {
+    StepBar,
+  },
   data() {
     return {
       audio: {},
@@ -77,12 +75,15 @@ export default {
     ...mapMutations(["setSongInfo", "playNext"]),
     demo() {
       this.playNext();
-      this.createRotateAnimation()
+      this.createRotateAnimation();
     },
+   
     handlerCanPlay() {
       this.setSongInfo({ duration: this.audio.duration });
       this.audio.play();
       this.createRotateAnimation();
+      this.$refs.percentBar.reset()
+      this.$refs.percentBar.start(this.audio.duration)
     },
     createRotateAnimation() {
       clearInterval(this.timer);
@@ -95,9 +96,9 @@ export default {
       this.$router.push("/play");
     },
     play() {
-      this.createRotateAnimation();
-      this.setSongInfo({ isPlay: true });
-      this.audio.play();
+      // this.createRotateAnimation();
+      // this.setSongInfo({ isPlay: true });
+      // this.audio.play();
     },
     pause() {
       clearInterval(this.timer);
@@ -119,7 +120,7 @@ export default {
   align-items: center;
   background: white;
   font-size: 0.28rem;
-  padding: 0 2vw 0 5vw;
+  padding:  0 5vw;
   box-shadow: 0 -2px 5px 1px #eee;
   .img {
     width: 0.8rem;

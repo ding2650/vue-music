@@ -88,7 +88,7 @@ export default new Vuex.Store({
         playUrl: res.data.data[0].url,
       })
       commit('updateSongList')
-      dispatch('songDetail', payload)
+      // dispatch('songDetail', payload)
 
     },
     // async songDetail({ commit }, payload) {

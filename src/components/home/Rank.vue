@@ -68,7 +68,6 @@ export default {
       });
     },
     linkPlayList({id}){
-      console.log(11)
       console.log(id)
     },
     initScroll() {
