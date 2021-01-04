@@ -11,6 +11,7 @@ export default new Vuex.Store({
       name: "",
       artist: "",
       gcIndex: 0,
+      gcList: [],
       playUrl: "",
       duration: 0,
       currentTime: 0,
@@ -29,6 +30,9 @@ export default new Vuex.Store({
     songsList: []
   },
   mutations: {
+    setGCList(state, payload) {
+      state.gcList = payload
+    },
     // 设置歌曲信息
     setSongInfo(state, payload) {
       state.songInfo = payload.playUrl ? {
@@ -39,6 +43,9 @@ export default new Vuex.Store({
     },
     setFixShow(state) {
       state.fixShow = true
+    },
+    hideFixShow(state) {
+      state.fixShow = false
     },
     // 
     pushSongInfo(state) {

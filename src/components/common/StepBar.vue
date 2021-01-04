@@ -22,43 +22,44 @@ export default {
       timer: null,
       isPlay: true,
       duration: 999,
-    };
+    }
   },
   mounted() {
-    this.ctx = this.$refs.bar.getContext("2d");
+    this.ctx = this.$refs.bar.getContext('2d')
   },
   computed: {
     intervalTime() {
-        console.log(this.duration)
-      return this.duration * 10;
+      console.log(this.duration)
+      return this.duration * 10
     },
   },
   methods: {
     changeStatus() {
-      this.isPlay = !this.isPlay;
+      this.isPlay = !this.isPlay
       if (this.isPlay) {
-        this.$emit("play");
+        this.$emit('play')
       } else {
-        this.$emit("pause");
+        this.$emit('pause')
       }
     },
     start(num) {
-      this.duration = num;
+      this.duration = num
       this.timer = setInterval(() => {
         if (this.percent === 100) {
-          clearInterval(this.timer);
+          clearInterval(this.timer)
         }
-        this.percent += 0.125;
-        this.num++;
-        this.draw();
-      }, this.intervalTime / 8);
+        this.percent += 0.125
+        this.num++
+        this.draw()
+      }, this.intervalTime / 8)
     },
     reset() {
-      this.percent = 0;
+      this.percent = 0
+      this.isPlay = true  
     },
     draw() {
-      this.$refs.bar.height = 34;
-      this.ctx.moveTo(18, 18);
+      this.$refs.bar.height = 34
+      this.ctx.moveTo(18, 18)
       this.ctx.arc(
         17,
         17,
@@ -66,15 +67,15 @@ export default {
         Math.PI * -0.5,
         (Math.PI * (this.percent - 50)) / 100,
         false
-      );
-      this.ctx.fillStyle = "#00aefd";
-      this.ctx.fill();
+      )
+      this.ctx.fillStyle = '#00aefd'
+      this.ctx.fill()
     },
     pause() {
-      clearInterval(this.timer);
+      clearInterval(this.timer)
     },
   },
-};
+}
 </script>
 
 <style lang='scss' scoped>

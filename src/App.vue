@@ -2,13 +2,13 @@
   <div id="app">
     <transition :name="animationStatus.name" :mode="animationStatus.mode">
       <keep-alive>
-        <router-view />
+        <router-view  @pause="pause" @continuePlay='continuePlay'/>
       </keep-alive>
     </transition>
 
     <!-- 固定底部歌曲播放器 -->
     <transition name="fade">
-      <section class="fix-play" v-if="fixShow">
+      <section class="fix-play" :class="fixShow?'':'hide'"  @click="handerDetail">
         <!-- <button @click="demo">btn</button> -->
 
         <div>
@@ -24,12 +24,16 @@
           <p>{{ songInfo.name }}</p>
           <p>{{ songInfo.artist }}</p>
         </div>
-      {{songInfo.duration}}
-        <div style="margin: 0 4vw 0 2vw">
-          <StepBar ref='percentBar' @pause="pause" @play="play"> </StepBar>
+        <!-- {{ songInfo.duration }} -->
+        <div style="margin: 0 4vw 0 2vw" @click.stop="STOP">
+          <StepBar ref="percentBar" @pause="pause" @play="continuePlay">
+          </StepBar>
         </div>
         <div>
-          <i class="iconfont icon-bofangliebiao"  style="font-size: 0.68rem;color:var(--color)"></i>
+          <i
+            class="iconfont icon-bofangliebiao"
+            style="font-size: 0.68rem; color: var(--color)"
+          ></i>
         </div>
       </section>
     </transition>
@@ -43,8 +47,8 @@
 </template>
 
 <script>
-import { mapMutations, mapState } from "vuex";
-import StepBar from "./components/common/StepBar";
+import { mapMutations, mapState } from 'vuex'
+import StepBar from './components/common/StepBar'
 export default {
   components: {
     StepBar,
@@ -53,62 +57,73 @@ export default {
     return {
       audio: {},
       timer: null,
-    };
+    }
   },
   computed: {
-    ...mapState(["songInfo", "songsList", "animationStatus", "fixShow"]),
+    ...mapState(['songInfo', 'songsList', 'animationStatus', 'fixShow']),
   },
   mounted() {
-    this.audio = this.$refs.audio;
-    this.audio.addEventListener("ended", () => {
-      this.playNext();
-    });
-    this.audio.addEventListener("timeupdated", () => {
+    this.audio = this.$refs.audio
+    this.audio.addEventListener('ended', () => {
+      this.playNext()
+    })
+    this.audio.addEventListener('timeupdated', () => {
       // let index = this.gcList.findIndex((item) => {
-      //   return item.start > this.audio.currentTime;
-      // });
-      // this.translate = index - 1;
-    });
+      //   return item.start > this.audio.currentTime
+      // })
+      // this.translate = index - 1
+    })
   },
 
   methods: {
-    ...mapMutations(["setSongInfo", "playNext"]),
-    demo() {
-      this.playNext();
-      this.createRotateAnimation();
-    },
-   
+    ...mapMutations(['setSongInfo', 'playNext']),
     handlerCanPlay() {
-      this.setSongInfo({ duration: this.audio.duration });
-      this.audio.play();
-      this.createRotateAnimation();
+      this.setSongInfo({ duration: this.audio.duration })
+      this.audio.play()
+      this.createRotateAnimation()
       this.$refs.percentBar.reset()
       this.$refs.percentBar.start(this.audio.duration)
     },
     createRotateAnimation() {
-      clearInterval(this.timer);
-      this.setSongInfo({ angle: 0 });
+      clearInterval(this.timer)
+      this.setSongInfo({ angle: 0 })
       this.timer = setInterval(() => {
-        this.setSongInfo({ angle: this.songInfo.angle + 0.36 });
-      }, 16.7);
+        this.setSongInfo({ angle: this.songInfo.angle + 0.36 })
+      }, 16.7)
     },
+    STOP() {},
     handerDetail() {
-      this.$router.push("/play");
+      this.$router.push('/play')
     },
     play() {
-      // this.createRotateAnimation();
-      // this.setSongInfo({ isPlay: true });
-      // this.audio.play();
+      
+      this.$refs.percentBar.reset()
+      this.createRotateAnimation()
+      this.setSongInfo({ isPlay: true })
+      this.audio.play()
     },
+    continuePlay() {
+      this.setSongInfo({ idPlay: true })
+      this.audio.play()
+      this.timer = setInterval(() => {
+        this.setSongInfo({ angle: this.songInfo.angle + 0.36 })
+      }, 16.7)
+    },
+
     pause() {
-      clearInterval(this.timer);
-      this.setSongInfo({ isPlay: false });
-      this.audio.pause();
+      clearInterval(this.timer)
+
+      console.log('暂停')
+      this.setSongInfo({ isPlay: false })
+      this.audio.pause()
     },
   },
-};
+}
 </script>>
 <style lang="scss" >
+.hide{
+  transform: translateY(100%);
+}
 .fix-play {
   position: fixed;
   z-index: 999;
@@ -120,7 +135,8 @@ export default {
   align-items: center;
   background: white;
   font-size: 0.28rem;
-  padding:  0 5vw;
+  padding: 0 5vw;
+  transition: all .36s ease-in-out;
   box-shadow: 0 -2px 5px 1px #eee;
   .img {
     width: 0.8rem;
@@ -145,6 +161,15 @@ export default {
     }
   }
 }
+.playing-enter,
+.playing-leave-to{
+  transform: scale(0);
+}
+.playing-enter-active,
+.playing-leave-active{
+  transition: all .36s ease-in-out;
+  transform-origin: left bottom;
+}
 .in-enter {
   transform: translateX(100%) rotateZ(90deg);
 }
@@ -157,9 +182,18 @@ export default {
 .out-leave-to {
   transform: translateX(100%) rotateZ(90deg);
 }
-
+.fade-enter{
+  transform: translateY(100%);
+}
+.fade-leave-to{
+  transform: translateY(100%);
+}
+.fade-enter-active,
+.fade-leave-active{
+  transition: all .32s ease-in-out;
+}
 .in-enter-active,
-.in-leave-active,
+// .in-leave-active,
 .out-leave-active {
   transition: all 0.42s ease-out;
   transform-origin: 100% 100%;
@@ -175,4 +209,5 @@ export default {
 .pad {
   padding-bottom: 1.15rem !important;
 }
+
 </style>

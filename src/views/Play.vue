@@ -17,7 +17,7 @@
               <img
                 class="img"
                 :src="songInfo.imgUrl"
-                :style="'transform:rotateZ(' + playParams.rot + 'deg)'"
+                :style="'transform:rotateZ(' + angle + 'deg)'"
                 alt=""
               />
             </div>
@@ -26,7 +26,7 @@
           <section class="gc" ref="slider">
             <ul
               ref="slid"
-              :style="`transform:translateY(${-translate*gcHeight}px)`"
+              :style="`transform:translateY(${-translate * gcHeight}px)`"
               style="transition: all 0.5s ease-in-out"
             >
               <li
@@ -56,9 +56,11 @@
             >
           </div>
           <div class="line">
-            <span class="nowtime">{{ formatMinutes(audio.currentTime) }}</span>
+            <span class="nowtime">{{
+              formatMinutes(songInfo.currentTime)
+            }}</span>
             <van-slider
-              :value="toInt(audio.currentTime)"
+              :value="toInt(songInfo.currentTime)"
               bar-height=".1rem"
               :max="songInfo.duration"
               inactive-color="rgba(0,0,0,.36)"
@@ -85,7 +87,6 @@
             <i class="iconfont icon-next-music"></i>
             <i class="iconfont icon-bofangliebiao"></i>
           </div>
-          <audio :src="songInfo.playUrl" autoplay ref="audio"></audio>
         </section>
       </main>
     </div>
@@ -93,170 +94,132 @@
 </template>
 
 <script>
-import { formatMinutes } from "../tools/tools";
-import { song, songDetail, lyric, album } from "../server/server";
-import { mapMutations, mapState } from "vuex";
+import { formatMinutes } from '../tools/tools'
+import { song, songDetail, lyric, album } from '../server/server'
+import { mapMutations, mapState } from 'vuex'
 export default {
   created() {
-    this.init();
+    this.init()
   },
   computed: {
-    ...mapState(["songInfo"]),
+    ...mapState(['songInfo']),
   },
   data() {
     return {
       speed: [0.75, 1, 1.25, 1.5, 2],
       speedIndex: 1,
-      audio: {
-        currentTime: 0,
-      },
       translate: 0,
+      angle: 0,
       gcHeight: 0,
-      curDalay: 1200,
-      per: 20,
-      // 播放参数
-      playParams: {
-        rot: 0,
-        time: 0,
-      },
-      gcIndx: 0,
       gcList: [],
-      // 暂停参数
-      pauseParams: {},
-      isPlay: false,
+      isPlay: true,
       timer: null,
       slider: null,
-    };
+    }
   },
   mounted() {
-    // this.initSwiper();
-    this.setHeight();
+    this.setHeight()
+    this.createRotate()
   },
   methods: {
+    createRotate() {
+      this.timer = setInterval(() => {
+        this.angle += 0.12
+      }, 16.7)
+    },
     // 设置单个歌词的高度
     setHeight() {
       const parentHeight = parseInt(
         getComputedStyle(this.$refs.slider, null).height
-      );
-      this.gcHeight = parentHeight / 2;
+      )
+      this.gcHeight = parentHeight / 2
     },
-   
+
     // 返回上一级
     back() {
-      // console.log(this.songInfo)
-      // 返回之前保存当前的播放状态
-      this.setSongInfo({
-        id:'',
-        gcIndex:this.translate,
-        currentTime:this.audio.currentTime,
-        isPlay:this.isPlay
-      })
-      this.$router.back();
+      this.$router.back()
     },
     // 改变播放速度
     changeSpeed(i) {
-      this.speedIndex = i;
-      this.audio.playbackRate = this.speed[i];
+      this.speedIndex = i
+      this.audio.playbackRate = this.speed[i]
     },
     // 更改播放歌曲的当前时间
     changeSongDuration(val) {
-      this.audio.currentTime = val;
+      this.audio.currentTime = val
     },
     // 设置暂停状态
     setPauseStatus() {
-      clearInterval(this.timer);
-      this.timer = null;
+      clearInterval(this.timer)
+      this.timer = null
     },
     // 设置播放状态
     setPlayStatus() {
-      clearInterval(this.timer);
+      console.log(1111)
       this.timer = setInterval(() => {
-        this.playParams.rot += 0.3 * this.speed[this.speedIndex];
+        this.angle += 0.12
       }, 16.7);
     },
     // 暂停歌曲
     pause() {
-      this.isPlay = false;
-      this.audio.pause();
-      this.setPauseStatus();
+      this.isPlay = false
+      this.$emit('pause')
+      this.setPauseStatus()
     },
     // 播放歌曲
     play() {
-      this.isPlay = true;
-      try {
-        this.audio.play();
-      } catch {}
-      this.setPlayStatus();
+      this.isPlay = true
+      this.$emit('continuePlay')
+      this.setPlayStatus()
     },
     // 设置事件监听
     setAudioEvents() {
       // 监听能否播放
-      this.audio.addEventListener("canplay", () => {
-        this.setSongInfo({ duration: this.audio.duration });
-      });
-      this.audio.addEventListener("timeupdate", () => {
+      this.audio.addEventListener('timeupdate', () => {
         let index = this.gcList.findIndex((item) => {
-          return item.start > this.audio.currentTime;
-        });
-        this.translate = index - 1;
-      });
+          return item.start > this.audio.currentTime
+        })
+        this.translate = index - 1
+      })
     },
     // 初始化数据
     init() {
-      if(this.songInfo.id){
-        // 已经播放的歌曲，设置播放的状态
-        return 
-      }
-      song().then((res) => {
-        this.setSongInfo({ playUrl: res.data.data[0].url });
-        this.audio = this.$refs.audio;
-        // 音频加载完成，设置事件监听
-        this.setAudioEvents();
-      });
-
-      // 歌曲封面
-      songDetail().then((res) => {
-        this.setSongInfo({
-          imgUrl: res.data.songs[0].al.picUrl,
-          name: res.data.songs[0].name,
-          artist: res.data.songs[0].ar[0].name,
-        });
-      });
       // 歌词
-      lyric().then((res) => {
-        let arr = res.data.lrc.lyric.split(/\n/);
+      lyric({
+        id: this.songInfo.id,
+      }).then((res) => {
+        let arr = res.data.lrc.lyric.split(/\n/)
         let arr2 = arr
           .map((item) => {
-            let temp = item.split("]");
+            let temp = item.split(']')
             let arr = temp[0]
-              .replace("[", "")
-              .replace(/\.(.*)/, "")
-              .split(":");
-            let start = +arr[0] * 60 + arr[1] * 1;
-            let msg = temp[1];
+              .replace('[', '')
+              .replace(/\.(.*)/, '')
+              .split(':')
+            let start = +arr[0] * 60 + arr[1] * 1
+            let msg = temp[1]
             return {
               start,
               msg,
-            };
+            }
           })
-          .filter((item) => item.msg);
-        let half = parseInt(arr2[0].start / 2);
+          .filter((item) => item.msg)
+        let half = parseInt(arr2[0].start / 2)
         this.gcList = [
           { start: 0, msg: this.songInfo.name },
           { start: half, msg: this.songInfo.artist },
-        ].concat(arr2);
+        ].concat(arr2)
         // **
-      });
-      this.play();
+      })
     },
     // 工具函数和辅助函数
-    ...mapMutations(["setSongInfo"]),
+    ...mapMutations(['setSongInfo']),
     formatMinutes: formatMinutes,
     toInt(num) {
-      return parseInt(num);
+      return parseInt(num)
     },
   },
-};
+}
 </script>
 
 <style lang='scss' scoped>
@@ -265,7 +228,7 @@ export default {
 }
 
 .gcAct {
-  color: red !important;
+  color:var(--color) !important;
 }
 
 .play-container {
