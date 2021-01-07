@@ -86,7 +86,7 @@ export default {
   .home-container {
     position: absolute;
     background: linear-gradient(to Top,white 50%,var(--color) 50%);
-    top: 2.15rem;
+    top: 2.08rem;
     left: 0;
     right: 0;
     bottom: 0;

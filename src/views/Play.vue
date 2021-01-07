@@ -1,96 +1,100 @@
 <template>
-  <transition name="song" appear>
-    <div class="play-container">
-      <img :src="songInfo.imgUrl" alt="" class="bg" />
-      <header>
-        <i class="back iconfont icon-xia" @click="back"></i>
-        <section class="info">
-          <p>{{ songInfo.name }}</p>
-          <p>{{ songInfo.artist }}</p>
-        </section>
-      </header>
-      <main>
-        <section class="body">
-          <div class="status" :class="isPlay ? '' : 'play'"></div>
-          <div class="top" style="height: 80%">
-            <div class="center">
-              <img
-                class="img"
-                :src="songInfo.imgUrl"
-                :style="'transform:rotateZ(' + angle + 'deg)'"
-                alt=""
-              />
-            </div>
-          </div>
-          <!-- 歌词滚动 -->
-          <section class="gc" ref="slider">
-            <ul
-              ref="slid"
-              :style="`transform:translateY(${-translate * gcHeight}px)`"
-              style="transition: all 0.5s ease-in-out"
-            >
-              <li
-                class="slid-item"
-                :style="'height:' + gcHeight + 'px'"
-                v-for="(item, i) in gcList"
-                :key="i"
-                :class="translate === i ? 'gcAct' : ''"
-                ref="gcItem"
-              >
-                {{ item.msg }}
-              </li>
-            </ul>
+  <section :open="open" :hide="hide">
+    <transition name="playing" appear>
+      <div v-if="show" class="play-container">
+        <img :src="songInfo.imgUrl" alt="" class="bg" />
+        <header>
+          <i class="back iconfont icon-xia" @click="back"></i>
+          <section class="info">
+            <p>{{ songInfo.name }}</p>
+            <p>{{ songInfo.artist }}</p>
           </section>
-        </section>
+        </header>
+        <main>
+          <section class="body">
+            <div class="status" :class="isPlay ? '' : 'play'"></div>
+            <div class="top" style="height: 80%">
+              <div class="center">
+                <img
+                  class="img"
+                  :src="songInfo.imgUrl"
+                  :style="'transform:rotateZ(' + angle + 'deg)'"
+                  alt=""
+                />
+              </div>
+            </div>
+            <!-- 歌词滚动 -->
+            <section class="gc" ref="slider">
+              <ul
+                ref="slid"
+                :style="`transform:translateY(${-translate * gcHeight}px)`"
+                style="transition: all 0.5s ease-in-out"
+              >
+                <li
+                  class="slid-item"
+                  :style="'height:' + gcHeight + 'px'"
+                  v-for="(item, i) in gcList"
+                  :key="i"
+                  :class="translate === i ? 'gcAct' : ''"
+                  ref="gcItem"
+                >
+                  {{ item.msg }}
+                </li>
+              </ul>
+            </section>
+          </section>
 
-        <section class="controls">
-          <div class="v">
-            倍速听歌
-            <span
-              class="speed-item"
-              v-for="(item, i) in speed"
-              :key="i"
-              :class="speedIndex == i ? 'act' : ''"
-              @click="changeSpeed(i)"
-              >x{{ item }}</span
-            >
-          </div>
-          <div class="line">
-            <span class="nowtime">{{
-              formatMinutes(songInfo.currentTime)
-            }}</span>
-            <van-slider
-              :value="toInt(songInfo.currentTime)"
-              bar-height=".1rem"
-              :max="songInfo.duration"
-              inactive-color="rgba(0,0,0,.36)"
-              active-color="#ee0a24"
-              @change="changeSongDuration"
-            >
-              <template #button>
-                <div class="slider-btn"></div>
-              </template>
-            </van-slider>
-            <span class="alltime">{{ formatMinutes(songInfo.duration) }}</span>
-          </div>
+          <section class="controls">
+            <div class="v">
+              倍速听歌
+              <span
+                class="speed-item"
+                v-for="(item, i) in speed"
+                :key="i"
+                :class="speedIndex == i ? 'act' : ''"
+                @click="changeSpeed(i)"
+                >x{{ item }}</span
+              >
+            </div>
+            <div class="line">
+              <span class="nowtime">{{
+                formatMinutes(songInfo.currentTime)
+              }}</span>
+              <van-slider
+                :value="toInt(songInfo.currentTime)"
+                bar-height=".1rem"
+                :max="songInfo.duration"
+                inactive-color="rgba(0,0,0,.36)"
+                active-color="#ee0a24"
+                @change="changeSongDuration"
+              >
+                <template #button>
+                  <div class="slider-btn"></div>
+                </template>
+              </van-slider>
+              <span class="alltime">{{
+                formatMinutes(songInfo.duration)
+              }}</span>
+            </div>
 
-          <div class="control">
-            <i class="iconfont icon-danquxunhuan"></i>
-            <i class="iconfont icon-previous"></i>
-            <van-icon
-              name="pause-circle-o"
-              size="1rem"
-              v-if="isPlay"
-              @click="pause"
-            />
-            <van-icon name="play-circle-o" size="1rem" v-else @click="play" />
-            <i class="iconfont icon-next-music"></i>
-            <i class="iconfont icon-bofangliebiao"></i>
-          </div>
-        </section>
-      </main>
-    </div>
-  </transition>
+            <div class="control">
+              <i class="iconfont icon-danquxunhuan"></i>
+              <i class="iconfont icon-previous"></i>
+              <van-icon
+                name="pause-circle-o"
+                size="1rem"
+                v-if="isPlay"
+                @click="pause"
+              />
+              <van-icon name="play-circle-o" size="1rem" v-else @click="play" />
+              <i class="iconfont icon-next-music"></i>
+              <i class="iconfont icon-bofangliebiao"></i>
+            </div>
+          </section>
+        </main>
+      </div>
+    </transition>
+  </section>
 </template>
 
 <script>
@@ -98,15 +102,14 @@ import { formatMinutes } from '../tools/tools'
 import { song, songDetail, lyric, album } from '../server/server'
 import { mapMutations, mapState } from 'vuex'
 export default {
-  created() {
-    this.init()
-  },
+  
   computed: {
     ...mapState(['songInfo']),
   },
   data() {
     return {
       speed: [0.75, 1, 1.25, 1.5, 2],
+      show: false,
       speedIndex: 1,
       translate: 0,
       angle: 0,
@@ -118,7 +121,6 @@ export default {
     }
   },
   mounted() {
-    this.setHeight()
     this.createRotate()
   },
   methods: {
@@ -126,6 +128,14 @@ export default {
       this.timer = setInterval(() => {
         this.angle += 0.12
       }, 16.7)
+    },
+    open(id) {
+      this.show = true
+      this.init(id)
+    },
+    hide() {
+      this.show = false
+      this.$emit('back')
     },
     // 设置单个歌词的高度
     setHeight() {
@@ -137,16 +147,17 @@ export default {
 
     // 返回上一级
     back() {
-      this.$router.back()
+      // this.$router.back()
+      this.hide()
     },
     // 改变播放速度
     changeSpeed(i) {
       this.speedIndex = i
-      this.audio.playbackRate = this.speed[i]
+      this.$emit('changeSpeed',this.speed[i])
     },
     // 更改播放歌曲的当前时间
     changeSongDuration(val) {
-      this.audio.currentTime = val
+      this.$emit('updateTime',val)
     },
     // 设置暂停状态
     setPauseStatus() {
@@ -155,10 +166,9 @@ export default {
     },
     // 设置播放状态
     setPlayStatus() {
-      console.log(1111)
       this.timer = setInterval(() => {
         this.angle += 0.12
-      }, 16.7);
+      }, 16.7)
     },
     // 暂停歌曲
     pause() {
@@ -173,14 +183,12 @@ export default {
       this.setPlayStatus()
     },
     // 设置事件监听
-    setAudioEvents() {
+    changeGcIndex(time) {
       // 监听能否播放
-      this.audio.addEventListener('timeupdate', () => {
-        let index = this.gcList.findIndex((item) => {
-          return item.start > this.audio.currentTime
-        })
-        this.translate = index - 1
+      let index = this.gcList.findIndex((item) => {
+        return item.start > time
       })
+      this.translate = index - 1
     },
     // 初始化数据
     init() {
@@ -209,6 +217,7 @@ export default {
           { start: 0, msg: this.songInfo.name },
           { start: half, msg: this.songInfo.artist },
         ].concat(arr2)
+        this.$nextTick(this.setHeight())
         // **
       })
     },
@@ -239,6 +248,7 @@ export default {
   left: 0;
   right: 0;
   z-index: 99;
+  background: #fff;
   display: flex;
   flex-direction: column;
   .bg {
@@ -331,7 +341,6 @@ export default {
     }
     .controls {
       height: 24vh;
-      background-color: rgba(173, 216, 230, 0.486);
       padding: 0.2rem;
       .v {
         display: flex;
@@ -383,4 +392,5 @@ export default {
   width: 0.2rem;
   height: 0.2rem;
 }
+
 </style>

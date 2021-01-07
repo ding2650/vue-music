@@ -58,25 +58,7 @@ const router = new VueRouter({
   routes,
 });
 router.beforeEach((to, from, next) => {
-  if (to.path === "/play") {
-    setTimeout(() => {
-      store.state.fixShow = false
-      // store.state.animationStatus.name = 'playing'
-    })
-  } else {
-    // store.state.animationStatus.name = 'in'
-
-  }
-  if (from.path === "/play") {
-    setTimeout(() => {
-      store.state.fixShow = true
-      // store.state.animationStatus.name = 'playing'
-
-    }, 0);
-  } else {
-    // store.state.animationStatus.name = 'in'
-
-  }
+  
   next();
 });
 

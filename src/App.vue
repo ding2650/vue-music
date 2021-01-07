@@ -2,13 +2,17 @@
   <div id="app">
     <transition :name="animationStatus.name" :mode="animationStatus.mode">
       <keep-alive>
-        <router-view  @pause="pause" @continuePlay='continuePlay'/>
+        <router-view @pause="pause" @continuePlay="continuePlay" />
       </keep-alive>
     </transition>
 
     <!-- 固定底部歌曲播放器 -->
     <transition name="fade">
-      <section class="fix-play" :class="fixShow?'':'hide'"  @click="handerDetail">
+      <section
+        class="fix-play"
+        :class="fixShow ? '' : 'hide'"
+        @click="handerDetail"
+      >
         <!-- <button @click="demo">btn</button> -->
 
         <div>
@@ -43,15 +47,27 @@
       @canplay="handlerCanPlay"
       autoplay
     ></audio>
+    <transition name="playing">
+        <Play
+          ref="play"
+          @back="setFixShow"
+          @pause="pause"
+          @continuePlay="continuePlay"
+          @updateTime="updateTime"
+          @changeSpeed="changeSpeed"
+        />
+    </transition>
   </div>
 </template>
 
 <script>
 import { mapMutations, mapState } from 'vuex'
+import Play from './views/Play'
 import StepBar from './components/common/StepBar'
 export default {
   components: {
     StepBar,
+    Play,
   },
   data() {
     return {
@@ -67,22 +83,27 @@ export default {
     this.audio.addEventListener('ended', () => {
       this.playNext()
     })
-    this.audio.addEventListener('timeupdated', () => {
-      // let index = this.gcList.findIndex((item) => {
-      //   return item.start > this.audio.currentTime
-      // })
-      // this.translate = index - 1
-    })
   },
 
   methods: {
-    ...mapMutations(['setSongInfo', 'playNext']),
+    ...mapMutations([
+      'setSongInfo',
+      'playNext',
+      'hideFixShow',
+      'setFixShow',
+      'setCurrentTime',
+    ]),
     handlerCanPlay() {
       this.setSongInfo({ duration: this.audio.duration })
       this.audio.play()
       this.createRotateAnimation()
       this.$refs.percentBar.reset()
       this.$refs.percentBar.start(this.audio.duration)
+      console.dir(this.audio)
+      this.audio.addEventListener('timeupdate', () => {
+        this.$refs.play.changeGcIndex(this.audio.currentTime)
+        this.setCurrentTime(this.audio.currentTime)
+      })
     },
     createRotateAnimation() {
       clearInterval(this.timer)
@@ -93,14 +114,21 @@ export default {
     },
     STOP() {},
     handerDetail() {
-      this.$router.push('/play')
+      // this.$router.push('/play')
+      this.$refs.play.open()
+      this.hideFixShow()
+    },
+    changeSpeed(val) {
+      this.audio.playbackRate = val
     },
     play() {
-      
       this.$refs.percentBar.reset()
       this.createRotateAnimation()
       this.setSongInfo({ isPlay: true })
       this.audio.play()
+    },
+    updateTime(val) {
+      this.audio.currentTime = val
     },
     continuePlay() {
       this.setSongInfo({ idPlay: true })
@@ -113,7 +141,6 @@ export default {
     pause() {
       clearInterval(this.timer)
 
-      console.log('暂停')
       this.setSongInfo({ isPlay: false })
       this.audio.pause()
     },
@@ -167,7 +194,7 @@ export default {
 }
 .playing-enter-active,
 .playing-leave-active{
-  transition: all .36s ease-in-out;
+  transition: all 10s ease-in-out;
   transform-origin: left bottom;
 }
 .in-enter {

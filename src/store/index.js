@@ -33,6 +33,9 @@ export default new Vuex.Store({
     setGCList(state, payload) {
       state.gcList = payload
     },
+    setCurrentTime(state,val){
+      state.songInfo.currentTime = val
+    },
     // 设置歌曲信息
     setSongInfo(state, payload) {
       state.songInfo = payload.playUrl ? {
