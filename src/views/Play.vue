@@ -182,9 +182,7 @@ export default {
       this.$emit('continuePlay')
       this.setPlayStatus()
     },
-    // 设置事件监听
     changeGcIndex(time) {
-      // 监听能否播放
       let index = this.gcList.findIndex((item) => {
         return item.start > time
       })
@@ -196,15 +194,15 @@ export default {
       lyric({
         id: this.songInfo.id,
       }).then((res) => {
-        let arr = res.data.lrc.lyric.split(/\n/)
-        let arr2 = arr
+        let arr1 = res.data.lrc.lyric.split(/\n/)
+        let arr2 = arr1
           .map((item) => {
             let temp = item.split(']')
-            let arr = temp[0]
+            let _arr = temp[0]
               .replace('[', '')
               .replace(/\.(.*)/, '')
               .split(':')
-            let start = +arr[0] * 60 + arr[1] * 1
+            let start = +_arr[0] * 60 + _arr[1] * 1
             let msg = temp[1]
             return {
               start,

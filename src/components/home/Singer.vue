@@ -4,11 +4,13 @@
       <section class="type-wrap">
         <span class="type-item"> 歌手分类： </span>
         <span
-          class="type-item"
+          class="type-item fade1"
           v-for="(item, i) in typeList"
           :key="'t' + i"
           :class="typeIndex === i ? 'active' : ''"
+          :style="'--index:' + i"
           @click="handlerChangeTypeIndex(i)"
+          @aninationend='refresh'
         >
           {{ item.label }}
         </span>
@@ -18,18 +20,20 @@
       <section class="type-wrap">
         <span class="type-item"> 首字母： </span>
         <span
-          class="type-item"
+          class="type-item fade2"
           v-for="(item, i) in letterList"
           :key="'t' + i"
           :class="letterIndex === i ? 'active' : ''"
-          @click="handlerChangeLetterIndex(i)"
+          :style="'--index:' + i"
+          @animationend='refresh'
+          @click.stop="handlerChangeLetterIndex(i)"
         >
           {{ item.label }}
         </span>
       </section>
     </div>
     <div class="fix-singer" ref="content">
-      <ul class="bs " ref="bs">
+      <ul class="bs" ref="bs">
         <li class="card" v-for="(singer, i) in singerList" :key="'s' + i">
           <div class="avatar">
             <img :src="singer.picUrl" alt="" />
@@ -42,10 +46,10 @@
 </template>
 
 <script>
-import BS from "better-scroll";
-import { artList } from "@api/server";
+import BS from 'better-scroll'
+import { artList } from '@api/server'
 export default {
-  name: "Rec",
+  name: 'Rec',
   data() {
     return {
       scrollType: null,
@@ -55,285 +59,288 @@ export default {
       letterIndex: -1,
       requsetParams: {
         // 歌手类型
-        type: "",
-        area: "",
+        type: '',
+        area: '',
         // 首字母
-        initial: "",
+        initial: '',
         // 偏移量
-        offset: 0,
       },
       singerScroll: null,
       letterList: [
         {
-          label: "A",
-          value: "a",
+          label: 'A',
+          value: 'a',
         },
         {
-          label: "B",
-          value: "b",
+          label: 'B',
+          value: 'b',
         },
         {
-          label: "C",
-          value: "c",
+          label: 'C',
+          value: 'c',
         },
         {
-          label: "D",
-          value: "d",
+          label: 'D',
+          value: 'd',
         },
         {
-          label: "E",
-          value: "e",
+          label: 'E',
+          value: 'e',
         },
         {
-          label: "F",
-          value: "f",
+          label: 'F',
+          value: 'f',
         },
         {
-          label: "G",
-          value: "g",
+          label: 'G',
+          value: 'g',
         },
         {
-          label: "H",
-          value: "h",
+          label: 'H',
+          value: 'h',
         },
         {
-          label: "I",
-          value: "i",
+          label: 'I',
+          value: 'i',
         },
         {
-          label: "J",
-          value: "j",
+          label: 'J',
+          value: 'j',
         },
         {
-          label: "K",
-          value: "k",
+          label: 'K',
+          value: 'k',
         },
         {
-          label: "L",
-          value: "l",
+          label: 'L',
+          value: 'l',
         },
         {
-          label: "M",
-          value: "m",
+          label: 'M',
+          value: 'm',
         },
         {
-          label: "N",
-          value: "n",
+          label: 'N',
+          value: 'n',
         },
         {
-          label: "O",
-          value: "o",
+          label: 'O',
+          value: 'o',
         },
         {
-          label: "P",
-          value: "p",
+          label: 'P',
+          value: 'p',
         },
         {
-          label: "Q",
-          value: "q",
+          label: 'Q',
+          value: 'q',
         },
         {
-          label: "R",
-          value: "r",
+          label: 'R',
+          value: 'r',
         },
         {
-          label: "S",
-          value: "s",
+          label: 'S',
+          value: 's',
         },
         {
-          label: "T",
-          value: "t",
+          label: 'T',
+          value: 't',
         },
         {
-          label: "U",
-          value: "u",
+          label: 'U',
+          value: 'u',
         },
         {
-          label: "V",
-          value: "v",
+          label: 'V',
+          value: 'v',
         },
         {
-          label: "W",
-          value: "w",
+          label: 'W',
+          value: 'w',
         },
         {
-          label: "X",
-          value: "x",
+          label: 'X',
+          value: 'x',
         },
         {
-          label: "Y",
-          value: "y",
+          label: 'Y',
+          value: 'y',
         },
         {
-          label: "Z",
-          value: "z",
+          label: 'Z',
+          value: 'z',
         },
       ],
       typeList: [
         {
-          label: "华语男",
+          label: '华语男',
           value: {
             type: 1,
             area: 7,
           },
         },
         {
-          label: "华语女",
+          label: '华语女',
           value: {
             type: 2,
             area: 7,
           },
         },
         {
-          label: "华语组合",
+          label: '华语组合',
           value: {
             type: 3,
             area: 7,
           },
         },
         {
-          label: "欧美男",
+          label: '欧美男',
           value: {
             type: 1,
             area: 96,
           },
         },
         {
-          label: "欧美女",
+          label: '欧美女',
           value: {
             type: 2,
             area: 96,
           },
         },
         {
-          label: "欧美组合",
+          label: '欧美组合',
           value: {
             type: 3,
             area: 96,
           },
         },
         {
-          label: "日本男",
+          label: '日本男',
           value: {
             type: 1,
             area: 8,
           },
         },
         {
-          label: "日本女",
+          label: '日本女',
           value: {
             type: 2,
             area: 8,
           },
         },
         {
-          label: "日本组合",
+          label: '日本组合',
           value: {
             type: 3,
             area: 8,
           },
         },
         {
-          label: "韩国男",
+          label: '韩国男',
           value: {
             type: 1,
             area: 16,
           },
         },
         {
-          label: "韩国女",
+          label: '韩国女',
           value: {
             type: 2,
             area: 16,
           },
         },
         {
-          label: "韩国组合",
+          label: '韩国组合',
           value: {
             type: 3,
             area: 16,
           },
         },
         {
-          label: "其他男歌手",
+          label: '其他男歌手',
           value: {
             type: 1,
             area: 0,
           },
         },
         {
-          label: "其他女歌手",
+          label: '其他女歌手',
           value: {
             type: 2,
             area: 0,
           },
         },
         {
-          label: "其他组合",
+          label: '其他组合',
           value: {
             type: 3,
             area: 0,
           },
         },
       ],
-    };
+    }
   },
   created() {
-    this.getList();
+    this.getList()
   },
   mounted() {
-    this.initScroll();
+    this.initScroll()
   },
   methods: {
+    refresh(){
+      this.scrollType.refresh()
+      this.scrollLetter.refresh()
+    },
     handlerChangeTypeIndex(i) {
-      this.typeIndex = this.typeIndex === i ? -1 : i;
+      this.typeIndex = this.typeIndex === i ? -1 : i
       this.requsetParams =
         this.typeIndex === -1
           ? {
               ...this.requsetParams,
-              type: "",
-              area: "",
+              type: '',
+              area: '',
             }
           : {
               ...this.requsetParams,
               ...this.typeList[this.typeIndex].value,
-            };
-      this.getList();
+            }
+      this.getList()
     },
     handlerChangeLetterIndex(i) {
-      this.letterIndex = this.letterIndex === i ? -1 : i;
+      console.log(i)
+      this.letterIndex = this.letterIndex === i ? -1 : i
       this.requsetParams.initial =
-        this.letterIndex === -1 ? "" : this.letterList[this.letterIndex].value;
-      this.getList();
+        this.letterIndex === -1 ? '' : this.letterList[this.letterIndex].value
+      this.getList()
     },
     initScroll() {
       this.scrollType = new BS(this.$refs.singerType, {
         scrollX: true,
         click: true,
-      });
+      })
       this.scrollLetter = new BS(this.$refs.letters, {
         scrollX: true,
         click: true,
-      });
+      })
     },
     //
     setSingerScroll() {
       this.singerScroll = new BS(this.$refs.content, {
         click: true,
-      });
+      })
     },
     getList() {
       // loading
       artList(this.requsetParams).then((res) => {
-        console.log(res);
-        this.singerList = res.data.artists;
+        this.singerList = res.data.artists
         this.$nextTick(() => {
-          this.setSingerScroll();
-        });
-      });
+          this.setSingerScroll()
+        })
+      })
     },
   },
-};
+}
 </script>
 
 <style lang='scss' scoped>
@@ -370,6 +377,27 @@ export default {
     }
   }
 }
+.fade1{
+        animation: fromBottom .32s ease-in-out;
+        animation-delay:calc(var(--index)* .1s) ;
+
+}
+.fade2{
+        animation: _opacity .32s ease-in-out;
+        animation-delay:calc(var(--index)* .1s) ;
+
+}
+@keyframes fromBottom{
+  from{
+    transform: translateY(.12rem);
+  }
+}
+@keyframes _opacity{
+  from{
+    opacity: .32;
+    transform: scale(.88);
+  }
+}
 .fix-singer {
   position: fixed;
   top: 3.3rem;
@@ -390,8 +418,9 @@ export default {
     display: flex;
     align-items: center;
     color: #666;
-    box-shadow: 0 0 0.12rem 0.02rem #eee;
+    box-shadow: 0 0 0.15rem 0.05rem #eee;
     margin-bottom: 0.12rem;
+    animation: toTop .32s ease-in-out;
     .avatar {
       width: 1.28rem;
       height: 1.28rem;
@@ -407,4 +436,9 @@ export default {
     }
   }
 }
+// @keyframes toTop {
+//   from{
+//     transform: translateY(.24rem);
+//   }
+// }
 </style>

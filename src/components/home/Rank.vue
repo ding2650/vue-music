@@ -144,12 +144,30 @@ export default {
   color: white;
   font-size: 0.24rem;
 }
+@keyframes bor{
+  0%,100%{
+    clip: rect(12px,0px,0px,0px);
+  }
+  25%{
+    clip: rect(0px,12px,0,0);
+
+  }
+  50%{
+    clip: rect(0px,0,12px,0);
+
+  }
+  75%{
+    clip: rect(0px,0,0,12px);
+
+  }
+}
 .item {
   position: relative;
   width: 32.5%;
   height: calc((100vw - 0.24rem) * 0.325);
   margin-right: 1.25%;
   margin-top: 0.16rem;
+  animation: bor 1s linear infinite;
   &:nth-child(3n) {
     margin-right: 0;
   }

@@ -1,6 +1,6 @@
 <template>
   <section class="rec" ref="content">
-    <main class="bs" ref="bs" >
+    <main class="bs" ref="bs">
       <Banner />
       <Loading :show="loading" />
       <section class="body" :style="hideSty">
@@ -12,12 +12,7 @@
             v-for="(item, i) in recList"
             :key="'r' + i"
           >
-            <img
-              class="img"
-              ref="image"
-              :src="item.picUrl"
-              alt=""
-            />
+            <img class="img" ref="image" :src="item.picUrl" alt="" />
             <p class="desc">{{ item.name }}</p>
             <span class="count">{{ formatCount(item.playCount) }}</span>
           </router-link>
@@ -28,34 +23,34 @@
 </template>
 
 <script>
-import BS from "better-scroll";
-import Swiper from "swiper";
-import Banner from "./components/Banner";
-import { recList } from "@api/server";
-import Loading from "../common/Loading";
+import BS from 'better-scroll'
+import Swiper from 'swiper'
+import Banner from './components/Banner'
+import { recList } from '@api/server'
+import Loading from '../common/Loading'
 import { formatCount } from '@tools/tools'
-import { mapState } from 'vuex';
+import { mapState } from 'vuex'
 export default {
-  name: "Rec",
+  name: 'Rec',
   components: {
     Banner,
     Loading,
   },
   data() {
     return {
-      scroll: "",
+      scroll: '',
       recList: [],
       loading: true,
       count: 0,
-    };
+    }
   },
   created() {
-    this.getList();
+    this.getList()
   },
   mounted() {
-    this.initScroll();
+    this.initScroll()
   },
-  activated (){
+  activated() {
     this.initScroll()
   },
   computed: {
@@ -63,46 +58,46 @@ export default {
     hideSty() {
       return `
       opacity:${this.loading ? 0 : 1}
-            `;
+            `
     },
   },
   methods: {
-    handlerPlayList (val) {
-    this.$router.push({
-      name:'PlayList',
-      // params:{
-      //   id:val.id
-      // }
-      query:{
-        id:val.id
-      }
-    })
+    handlerPlayList(val) {
+      this.$router.push({
+        name: 'PlayList',
+        // params:{
+        //   id:val.id
+        // }
+        query: {
+          id: val.id,
+        },
+      })
     },
     initScroll() {
       this.scroll = new BS(this.$refs.content, {
-        click:true
-      });
+        click: true,
+      })
     },
+
     getList() {
       recList().then((res) => {
-        this.recList = res.data.result;
+        this.recList = res.data.result
         this.$nextTick((item) => {
           this.$refs.image.forEach((item) => {
             item.onload = () => {
-              this.count++;
+              this.count++
               if (this.count === this.recList.length) {
-                this.loading = false;
+                this.loading = false
               }
-            };
-          });
-          this.scroll.refresh();
-        });
-      });
+            }
+          })
+          this.scroll.refresh()
+        })
+      })
     },
-    formatCount
-   
+    formatCount,
   },
-};
+}
 </script>
 
 <style lang='scss' scoped>
@@ -140,6 +135,7 @@ export default {
     border-radius: 0.08rem;
     box-shadow: 0 0 8px 2px #eee;
     padding-bottom: 0.12rem;
+    animation: foo .32s ease-in-out;
     &:nth-child(3n) {
       margin-right: 0;
     }
@@ -169,6 +165,13 @@ export default {
       top: 0.1rem;
       color: #eee;
     }
+  }
+}
+
+@keyframes foo {
+  from{
+    transform: scale(.88);
+    opacity: .72;
   }
 }
 </style>
