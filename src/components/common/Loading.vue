@@ -1,5 +1,5 @@
 <template>
-  <section class="loading" v-if="show">
+  <section @touchstart='stop' @touchmove='stop' @click.stop="stop" class="loading" v-if="show" :class="mask?'mask':''">
     <ul class="center">
       <li class="line"></li>
       <li class="line"></li>
@@ -17,8 +17,15 @@ export default {
       type: Boolean,
       require: true,
     },
+    mask:{
+      type:Boolean,
+      default:false
+    }
     
   },
+  methods:{
+    stop(){},
+  }
 };
 </script>
 
@@ -27,10 +34,14 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%,-50%);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+  // transform: translate(-50%,-50%);
+  background: #fff;
   .center {
     display: flex;
     .msg{
@@ -70,4 +81,9 @@ export default {
     transform: scaleY(1.2);
   }
 }
+.mask{
+  position: fixed;
+  background: transparent;
+}
+
 </style>

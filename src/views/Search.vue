@@ -1,13 +1,11 @@
 <template>
   <section class="search-container fix">
     <header class="header">
-      <Back >
-      
-      </Back>
+      <Back />
       <div class="mock-input">
         <input
           type="text"
-          v-model="searchParams.q"
+          v-model="searchParams.keywords"
           @input="handlerInput"
           class="input"
           :placeholder="defaultMsg"
@@ -15,7 +13,29 @@
       </div>
     </header>
     <!--  -->
-    <section class="body">
+    <main ref="bs" class="list">
+      <div class="content">
+        <ul>
+          <li
+            class="item"
+            v-for="(item, i) in songsList"
+            :key="i"
+            @click="handlerPlay($event, item)"
+          >
+            <h5>{{ formatAuthor(item.name) }}</h5>
+            <p>
+              <span></span>
+              <span>{{ item.artists[0].name }}</span>
+              <span style="margin: 0 0.08rem">-</span>
+              <span>{{ item.album.name }}</span>
+            </p>
+          </li>
+        </ul>
+        <div v-if="songsList.length" style="height: 1.28rem"></div>
+      </div>
+      <Loading :show="show" />
+    </main>
+    <section class="body" v-if="!songsList.length">
       <header>
         <h3>热搜榜</h3>
         <div class="play-all">
@@ -30,6 +50,7 @@
             :class="hot.className"
             v-for="(hot, i) in hotList"
             :key="'h' + i"
+            @click="playSong(hot)"
           >
             <span>{{ i + 1 }}</span>
             <span>{{ hot.first }} </span>
@@ -38,61 +59,131 @@
         </ul>
       </div>
     </section>
+    <Parabola ref="love" />
   </section>
 </template>
 
 <script>
-import { hots,placeHolder } from "@api/server";
+import { hots, placeHolder, searchList } from '@api/server'
 import Back from '@com/common/Back'
+import BS from 'better-scroll'
+import { mapMutations, mapState } from 'vuex'
+import Loading from '../components/common/Loading.vue'
+import Parabola from '../components/common/Parabola.vue'
 export default {
-  components:{
-    Back
+  components: {
+    Back,
+    Loading,
+    Parabola,
   },
   data() {
     return {
+      show: false,
       searchParams: {
-        q: "",
-        page: 1,
-        limit: 10,
+        keywords: '',
+        // page: 1,
+        // limit: 10,
       },
       timer: null,
+      scroll: null,
       hotList: [],
-      defaultMsg:'',
-      classList: ["first", "second", "third"],
-    };
+      defaultMsg: '',
+      songsList: [],
+      classList: ['first', 'second', 'third'],
+    }
+  },
+  computed: {
+    ...mapState(['fixShow']),
   },
   created() {
-    this.getList();
+    this.getList()
+    this.setAnimationStatus(false)
+  },
+  mounted() {
+    this.scroll = new BS(this.$refs.bs, {
+      click: true,
+    })
   },
   methods: {
+    ...mapMutations(['setAnimationStatus']),
+    formatAuthor(str) {
+      return str
+    },
     handlerInput() {
-      clearTimeout(this.timer);
+      clearTimeout(this.timer)
       this.timer = setTimeout(() => {
-        this.searchList();
-      }, 900);
+        this.searchList()
+      }, 320)
+    },
+    handlerPlay(e, item) {
+      this.$refs.love.open(e, {
+        id: item.id,
+        artist: item.artists[0].name,
+        imgUrl: item.artists[0].img1v1Url,
+        name: item.name,
+      })
     },
     searchList() {
-      console.log("请求");
+      if (!this.searchParams.keywords) {
+        this.songsList = []
+        return
+      }
+      this.show = true
+      searchList(this.searchParams).then((res) => {
+        this.songsList = res.data.result.songs
+        this.$nextTick(() => {
+          this.scroll.refresh()
+          this.show = false
+        })
+      })
+    },
+    playSong(item) {
+      this.searchParams.keywords = item.first
+      this.searchList()
     },
     getList() {
-      placeHolder().then(res=>{
+      placeHolder().then((res) => {
         this.defaultMsg = res.data.data.showKeyword
       })
       hots().then((res) => {
         this.hotList = res.data.result.hots.map((k, i) => {
           return {
             ...k,
-            className: this.classList[i] || "",
-            haveTag:Math.random() <=0.26?true:false
-          };
-        });
-      });
+            className: this.classList[i] || '',
+            haveTag: Math.random() <= 0.26 ? true : false,
+          }
+        })
+      })
     },
   },
-};
+}
 </script>
 
 <style lang='scss'scoped>
+.list{
+  padding: .24rem;
+  font-size: .28rem;
+  position: absolute;
+  top: .88rem;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  h5{
+    font-weight: 400;
+    color:#000;
+    font-size: .32rem;
+  }
+  .item{
+    line-height: 1.52;
+    padding:.12rem 0 ;
+    >h5{
+      width: 7rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    }
+  }
+}
 .body {
   padding: 0.24rem;
   > header {
@@ -126,6 +217,11 @@ export default {
 
   .header {
     display: flex;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 9;
     align-items: center;
     padding: 0.12rem;
     padding-bottom: 0.18rem;
@@ -162,11 +258,17 @@ export default {
     height: 0.66rem;
     line-height: 0.66rem;
     position: relative;
+    display: inline-block;
+    max-width: 3.6rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     .tag{
       font-weight: 600;
       color: #ff2d51;
       font-style: italic;
       font-size: .24rem;
+      margin-right: 0;
     }
     > span {
       margin-right: 0.18rem;

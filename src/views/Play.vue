@@ -1,5 +1,5 @@
 <template>
-  <section :open="open" :hide="hide">
+  <section :open="open" :hide="hide" :setPlayStatus='setPlayStatus' :setPauseStatus='setPauseStatus'>
     <transition name="playing" appear>
       <div v-if="show" class="play-container">
         <img :src="songInfo.imgUrl" alt="" class="bg" />
@@ -102,7 +102,6 @@ import { formatMinutes } from '../tools/tools'
 import { song, songDetail, lyric, album } from '../server/server'
 import { mapMutations, mapState } from 'vuex'
 export default {
-  
   computed: {
     ...mapState(['songInfo']),
   },
@@ -142,7 +141,7 @@ export default {
       const parentHeight = parseInt(
         getComputedStyle(this.$refs.slider, null).height
       )
-      this.gcHeight = parentHeight / 2
+      this.gcHeight = parentHeight / 3
     },
 
     // 返回上一级
@@ -153,32 +152,34 @@ export default {
     // 改变播放速度
     changeSpeed(i) {
       this.speedIndex = i
-      this.$emit('changeSpeed',this.speed[i])
+      this.$emit('changeSpeed', this.speed[i])
     },
     // 更改播放歌曲的当前时间
     changeSongDuration(val) {
-      this.$emit('updateTime',val)
+      this.$emit('updateTime', val)
     },
     // 设置暂停状态
     setPauseStatus() {
+      this.isPlay = false
       clearInterval(this.timer)
       this.timer = null
     },
     // 设置播放状态
     setPlayStatus() {
+      if(this.isPlay) return
+      this.isPlay = true
       this.timer = setInterval(() => {
         this.angle += 0.12
       }, 16.7)
     },
     // 暂停歌曲
     pause() {
-      this.isPlay = false
+      if(!this.isPlay)  return
       this.$emit('pause')
       this.setPauseStatus()
     },
     // 播放歌曲
     play() {
-      this.isPlay = true
       this.$emit('continuePlay')
       this.setPlayStatus()
     },
@@ -233,7 +234,9 @@ export default {
 .icon-zantingtingzhi {
   transform: scale(1.2) translateX(-0.12rem);
 }
-
+.speed-item{
+  font-size: .28rem;
+}
 .gcAct {
   color:var(--color) !important;
 }

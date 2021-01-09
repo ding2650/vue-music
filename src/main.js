@@ -16,6 +16,7 @@ Vue.use(Vant);
 import  './assets/css/reset.css'
 import  './assets/icons/iconfont.css'
 import  './assets/js/font-size.js'
+import './tools/back'
 Vue.config.productionTip = false
 
 new Vue({

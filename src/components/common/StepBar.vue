@@ -1,5 +1,5 @@
 <template>
-  <section class="step-wrapper" :start="start" :pause="pause">
+  <section class="step-wrapper" :start="start" :pause="pause"  :setPlayStatus='setPlayStatus' :setPauseStatus='setPauseStatus'>
     <canvas id="bar" ref="bar" width="34" height="34"></canvas>
     <div class="block" @click="changeStatus">
       <img
@@ -42,6 +42,13 @@ export default {
         this.$emit('pause')
       }
     },
+    setPauseStatus(){
+      this.isPlay = false
+    },
+     setPlayStatus(){
+      this.isPlay = true
+    },
+    
     start(num) {
       this.duration = num
       this.timer = setInterval(() => {

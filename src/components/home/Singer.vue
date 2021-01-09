@@ -1,31 +1,36 @@
 <template>
   <section class="singer-container">
-    <div class="types" ref="singerType">
-      <section class="type-wrap">
-        <span class="type-item"> 歌手分类： </span>
+    <div
+      class="types stop"
+      @toustart.stop="stop"
+      @touchmove="stop"
+      ref="singerType"
+    >
+      <section class="type-wrap stop">
+        <span class="type-item stop"> 歌手分类： </span>
         <span
-          class="type-item fade1"
+          class="type-item fade1 stop"
           v-for="(item, i) in typeList"
           :key="'t' + i"
           :class="typeIndex === i ? 'active' : ''"
           :style="'--index:' + i"
-          @click="handlerChangeTypeIndex(i)"
-          @aninationend='refresh'
+          @click.stop="handlerChangeTypeIndex(i)"
+          @aninationend="refresh"
         >
           {{ item.label }}
         </span>
       </section>
     </div>
-    <div class="types" ref="letters">
-      <section class="type-wrap">
+    <div class="types stop" ref="letters">
+      <section class="type-wrap stop">
         <span class="type-item"> 首字母： </span>
         <span
-          class="type-item fade2"
+          class="type-item fade2 stop"
           v-for="(item, i) in letterList"
           :key="'t' + i"
           :class="letterIndex === i ? 'active' : ''"
           :style="'--index:' + i"
-          @animationend='refresh'
+          @animationend="refresh"
           @click.stop="handlerChangeLetterIndex(i)"
         >
           {{ item.label }}
@@ -34,12 +39,21 @@
     </div>
     <div class="fix-singer" ref="content">
       <ul class="bs" ref="bs">
-        <li class="card" v-for="(singer, i) in singerList" :key="'s' + i">
+        <Loading :mask='!isFirst' :show="show" />
+
+        <router-link
+          tag="li"
+          class="card"
+          v-for="(singer, i) in singerList"
+          :key="'s' + i"
+          :to="'/singerSongs/'+singer.id"
+
+        >
           <div class="avatar">
-            <img :src="singer.picUrl" alt="" />
+            <img  ref="img" :src="singer.picUrl"  alt="" />
           </div>
           {{ singer.name }}
-        </li>
+        </router-link>
       </ul>
     </div>
   </section>
@@ -47,14 +61,20 @@
 
 <script>
 import BS from 'better-scroll'
+import Loading from '../common/Loading'
 import { artList } from '@api/server'
 export default {
   name: 'Rec',
+  components: {
+    Loading,
+  },
   data() {
     return {
       scrollType: null,
       singerList: [],
+      isFirst:true,
       scrollLetter: null,
+      show: false,
       typeIndex: -1,
       letterIndex: -1,
       requsetParams: {
@@ -172,6 +192,7 @@ export default {
           value: 'z',
         },
       ],
+      count: 0,
       typeList: [
         {
           label: '华语男',
@@ -286,12 +307,29 @@ export default {
   },
   mounted() {
     this.initScroll()
+    this.singerScroll = new BS(this.$refs.content, {
+      click: true,
+    })
   },
   methods: {
-    refresh(){
+    stop() {},
+    loadImg() {
+      let _count = 0
+      this.$refs.img.forEach((item) => {
+        item.onload = () => {
+        _count ++ 
+        if(_count === this.$refs.img.length){
+          this.show =false
+          this.isFirst = false
+        }
+        }
+      })
+    },
+    refresh() {
       this.scrollType.refresh()
       this.scrollLetter.refresh()
     },
+    
     handlerChangeTypeIndex(i) {
       this.typeIndex = this.typeIndex === i ? -1 : i
       this.requsetParams =
@@ -308,7 +346,6 @@ export default {
       this.getList()
     },
     handlerChangeLetterIndex(i) {
-      console.log(i)
       this.letterIndex = this.letterIndex === i ? -1 : i
       this.requsetParams.initial =
         this.letterIndex === -1 ? '' : this.letterList[this.letterIndex].value
@@ -325,17 +362,14 @@ export default {
       })
     },
     //
-    setSingerScroll() {
-      this.singerScroll = new BS(this.$refs.content, {
-        click: true,
-      })
-    },
+
     getList() {
-      // loading
+      this.show = true
       artList(this.requsetParams).then((res) => {
         this.singerList = res.data.artists
         this.$nextTick(() => {
-          this.setSingerScroll()
+          this.loadImg()
+          this.singerScroll.refresh()
         })
       })
     },
@@ -347,16 +381,24 @@ export default {
 .singer-container {
   padding: 0.08rem 0;
   background: var(--bg-color);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
   z-index: 1;
 
   .types {
     width: 100vw;
     height: 0.42rem;
     margin-top: 0.08rem;
+    background: var(--bg-color);
     line-height: 0.42rem;
+      overflow: hidden;
+
     .type-wrap {
       width: max-content;
       font-size: 0.26rem;
+    background: var(--bg-color);
       color: #666;
       display: flex;
       .type-item {
@@ -399,12 +441,11 @@ export default {
   }
 }
 .fix-singer {
-  position: fixed;
-  top: 3.3rem;
+  position: absolute;
+  top: 1.16rem;
   left: 0;
   right: 0;
   background: white;
-  padding: 0.12rem;
   height: calc(100vh - 3.1rem);
   overflow: hidden;
   .bs {

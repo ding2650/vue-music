@@ -8,7 +8,7 @@ import store from "../store/index";
 
 Vue.use(VueRouter);
 
-const routes = [
+export const routes = [
   {
     path: "/",
     redirect: "/home",
@@ -18,10 +18,6 @@ const routes = [
     name: "Home",
     redirect: "/home/rec",
     component: Home,
-    beforeEnter: (to, from, next) => {
-      console.log(from);
-      next();
-    },
     children: [
       {
         path: "rec",
@@ -48,6 +44,11 @@ const routes = [
     component: () => import("../views/PlayList"),
   },
   {
+    path: "/singerSongs/:id",
+    name: "singerSongs",
+    component: () => import("../views/SingerSongs"),
+  },
+  {
     path: "/play",
     name: "Play",
     component: () => import("../views/Play"),
@@ -57,9 +58,6 @@ const routes = [
 const router = new VueRouter({
   routes,
 });
-router.beforeEach((to, from, next) => {
-  
-  next();
-});
+
 
 export default router;

@@ -30,6 +30,11 @@ export default new Vuex.Store({
     songsList: []
   },
   mutations: {
+    setAnimationStatus(state,flag){
+      console.log(state.animationStatus)
+      // state.animationStatus.mode = flag?'in-out':'out-in'
+      state.animationStatus.name = flag?'in':'out'
+    },
     setGCList(state, payload) {
       state.gcList = payload
     },

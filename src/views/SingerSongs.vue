@@ -3,50 +3,15 @@
     <main :class="fixShow?'padding-bot':''">
       <div class="header">
         <div class="bg">
-          <img class="bg-img" :src="infos.coverImgUrl" alt="" />
+          <img class="bg-img" :src="infos.picUrl" alt="" />
+          <div class="mask"></div>
         </div>
         <div class="content">
           <header>
             <Back style="transform: translateY(0.05rem)" />
-            <h3>歌单</h3>
+            <h3>{{infos.name}}</h3>
           </header>
-          <section class="top-header">
-            <section class="cover-img">
-              <img class="full" :src="infos.coverImgUrl" alt="" />
-              <span class="count">{{ formatCount(infos.playCount) }}</span>
-            </section>
-            <section class="right">
-              <p class="title">{{ infos.name }}</p>
-              <div class="author">
-                <img
-                  class="img"
-                  :src="infos.creator && infos.creator.avatarUrl"
-                  alt=""
-                />
-                <span class="bar">
-                  {{ infos.creator && infos.creator.nickname }}
-                </span>
-              </div>
-            </section>
-          </section>
-          <ul class="ul" ref="content">
-            <li class="li">
-              <van-icon name="chat-o" size="22" />
-              <span class="span"> 评论</span>
-            </li>
-            <li class="li">
-              <van-icon name="like-o" size="22" />
-              <span class="span"> 点赞</span>
-            </li>
-            <li class="li">
-              <van-icon name="add-o" size="22" />
-              <span class="span"> 收藏</span>
-            </li>
-            <li class="li">
-              <van-icon name="ellipsis" class="rot" size="22" />
-              <span class="span"> 更多</span>
-            </li>
-          </ul>
+         
         </div>
       </div>
       <div class="list">
@@ -59,10 +24,7 @@
             />
             播放全部<span class="span">(共{{list.length}}首)</span>
           </section>
-          <section class="list-right">
-            <van-icon name="plus" style="margin-right: 0.08rem" size=".36rem" />
-            收藏 {{formatCount(infos.subscribedCount)}}
-          </section>
+         
         </header>
         <ul class="songs">
           <li class="songs-item" v-for="(item, i) in list" :key="i" @click="createAnimate($event,item,i)">
@@ -89,7 +51,7 @@
 <script>
 import Back from "@com/common/Back";
 import { formatCount } from "@tools/tools";
-import { playList } from "@api/server";
+import { singerSongs } from "@api/server";
 import BS from "better-scroll";
 import { mapActions, mapMutations, mapState } from 'vuex';
 export default {
@@ -147,9 +109,9 @@ export default {
       }, "");
     },
     getList() {
-      playList({ id: this.$route.params.id }).then((res) => {
-        this.infos = res.data.playlist;
-        this.list = res.data.playlist.tracks;
+      singerSongs({ id: this.$route.params.id }).then((res) => {
+        this.infos = res.data.artist;
+        this.list = res.data.hotSongs;
         setTimeout(() => {
           this.$nextTick(() => {
             this.initScoll();
@@ -220,7 +182,9 @@ export default {
   display: flex;
   align-items: center;
   .order {
-    padding: 0.52rem;
+    padding: 0.52rem .24rem .52rem .18rem;
+    width: .88rem;
+    text-align: center;
   }
   .info {
     display: flex;
@@ -261,9 +225,21 @@ export default {
       align-items: center;
     }
     .list-left {
-      flex: 0 0 55%;
+      // flex: 0 0 55%;
+      flex: 1;
       height: 100%;
-      border-bottom: 1px solid #ccc;
+      position: relative;
+      &::before{
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        transform: scaleX(2) scaleY(.88);
+        opacity: .88;
+        background: #eee;
+      }
       .span {
         margin-left: 0.12rem;
         color: #ccc;
@@ -295,11 +271,18 @@ export default {
     left: 0;
     right: 0;
     bottom: 0;
-    background: #999;
-    .bg-img {
-      filter: blur(0.52rem);
+    background: transparent;
+    .bg-img,.mask {
+      // filter: blur(0.01rem);
       width: 100%;
       height: 100%;
+      position: relative;
+    }
+    .mask{
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: rgba($color: #161823, $alpha: .36);
     }
   }
   .content {
@@ -373,24 +356,6 @@ export default {
       margin-bottom: 0.12rem;
     }
   }
-  .top-header {
-    // background: lightcoral;
-    padding: 0.36rem;
-    display: flex;
-    .cover-img {
-      width: 2.56rem;
-      height: 2.56rem;
-      position: relative;
-      border-radius: 0.12rem;
-      overflow: hidden;
-      // background: lightblue;
-      .count {
-        position: absolute;
-        right: 2%;
-        top: 2%;
-        color: white;
-      }
-    }
-  }
+
 }
 </style>

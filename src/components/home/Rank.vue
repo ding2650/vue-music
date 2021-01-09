@@ -86,6 +86,10 @@ export default {
   background: var(--bg-color);
   overflow: hidden;
   z-index: 1;
+  position: absolute;
+  top: 0rem;
+  left: 0;
+  right: 0;
   .bs {
     background: var(--bg-color);
     padding: 0.08rem 0.16rem;

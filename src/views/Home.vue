@@ -1,11 +1,12 @@
 <template>
   <div class="home fix">
+    <Setting ref='setting' />
     <header>
-      <van-icon name="wap-nav" size="26" />
+      <van-icon @click="openDrawer" name="wap-nav" size="26" />
       <span> Music </span>
-      <router-link to="/search">
+      <span @click="linkSearch">
         <van-icon name="search" size="26" />
-      </router-link>
+      </span>
     </header>
     <nav style="position: relative">
       <div
@@ -23,11 +24,11 @@
         {{ navsArr[activeIndex].msg }}
       </div>
     </nav>
-    <div class="home-container" >
+    <div class="home-container" @touchstart="start" @touchend="end">
       <keep-alive>
-        <!-- <transition :name="deriction" mode="in-out"> -->
+        <transition :name="deriction">
           <router-view class="type" ref="type" />
-        <!-- </transition> -->
+        </transition>
       </keep-alive>
     </div>
   </div>
@@ -35,44 +36,120 @@
 
 <script>
 // import Banner from "@com/home/Banner";
-import BS from "better-scroll";
-import { mapState } from 'vuex';
-
+import Setting from '../components/home/components/IndexDrawer'
+import BS from 'better-scroll'
+import { mapMutations, mapState } from 'vuex'
+const LEFT = 'fromLeft'
+const RIGHT = 'fromRight'
 export default {
-  name: "Home",
-  components: {},
+  name: 'Home',
+  components: {
+    Setting
+  },
   data() {
     return {
       navsArr: [
-        { msg: "推荐", to: "/home/rec" },
-        { msg: "歌手", to: "/home/singer" },
-        { msg: "排行榜", to: "/home/rank" },
+        { msg: '推荐', to: '/home/rec' },
+        { msg: '歌手', to: '/home/singer' },
+        { msg: '排行榜', to: '/home/rank' },
       ],
       activeIndex: 0,
-      deriction: "fromLeft",
-    };
+      timer: null,
+      isFastSlid: true,
+      fastTime: 200,
+      initPoint: {
+        x: 0,
+        y: 0,
+      },
+      deriction: LEFT,
+    }
   },
-  computed :{
-    ...mapState(['fixShow'])
+  computed: {
+    ...mapState(['fixShow']),
   },
-  mounted() {
+  activated() {
+    this.setAnimationStatus(true)
+    let index = this.getCurIndex()
     setTimeout(() => {
-      this.setLine();
-    }, 0);
+      this.setLine(index)
+    }, 0)
   },
   methods: {
+    ...mapMutations(['setAnimationStatus']),
+    linkSearch(){
+      this.setAnimationStatus(true)
+      this.$router.push('/search')
+    },
+    openDrawer(){
+      this.$refs.setting.open()
+    },
+    getCurIndex(){
+      return this.navsArr.findIndex((item) => {
+      return this.$route.path === item.to
+    })
+    },
+    start(e) {
+      let flag =  /stop/g.test(e.target.className)
+      if(flag) return
+
+      this.isFastSlid = true
+      this.initPoint = {
+        x: e.touches[0].screenX,
+        y: e.touches[0].screenY,
+      }
+      this.timer = setTimeout(() => {
+        this.timer = null
+        this.isFastSlid = false
+      }, this.fastTime)
+    },
+    linkToLeft() {
+      console.log(1)
+      let index = this.getCurIndex()
+      let target = this.navsArr[index + 1] || this.navsArr[index]
+      this.toggle(target.to, ++index)
+    },
+    linkToRight() {
+
+      let index = this.getCurIndex()
+      let target = this.navsArr[index - 1] || this.navsArr[index]
+      this.toggle(target.to, --index)
+    },
+    end(e) {
+      if (!this.isFastSlid || e.target.tagName==='SPAN') return
+      let endPoint = e.changedTouches[0]
+      let absX = this.initPoint.x - endPoint.screenX
+      let absY = this.initPoint.y - endPoint.screenY
+      let distance = Math.abs(absX) - Math.abs(absY)
+      console.log(e)
+      if (distance > 0) {
+        if (absX > 0) {
+          this.linkToLeft()
+        } else {
+          this.linkToRight()
+        }
+      } else {
+        // console.log('垂直')
+      }
+      clearTimeout(this.timer)
+    },
     // 横条left
     setLine() {
-      let el = this.$refs.navItem[this.activeIndex];
-      this.$refs.line.style.left = el.offsetLeft + "px";
+      let el = this.$refs.navItem[this.activeIndex]
+      this.$refs.line.style.left = el.offsetLeft + 'px'
+    },
+    setDeriction() {
+      let curIndex = this.getCurIndex()
+      this.deriction = curIndex < this.activeIndex ? RIGHT : LEFT
     },
     toggle(to, i) {
-      this.activeIndex = i;
-      this.setLine();
-      this.$router.push(to).catch(() => {});
+      if (i === this.navsArr.length || i < 0) return
+      this.activeIndex = i
+      this.setLine()
+      this.setDeriction(to)
+      this.$router.push(to).catch(() => {})
     },
   },
-};
+}
 </script>
 <style lang="scss" scoped>
 .home {
@@ -86,7 +163,7 @@ export default {
   .home-container {
     position: absolute;
     background: linear-gradient(to Top,white 50%,var(--color) 50%);
-    top: 2.08rem;
+    top: 2.1rem;
     left: 0;
     right: 0;
     bottom: 0;
@@ -129,5 +206,18 @@ export default {
   }
 }
 
-
+.fromLeft-enter,
+.fromRight-leave-to{
+  transform: translateX(-100%);
+}
+.fromRight-enter,
+.fromLeft-leave-to{
+  transform: translateX(100%);
+}
+.fromLeft-enter-active,
+.fromRight-enter-active,
+.fromLeft-leave-active,
+.fromRight-leave-active{
+  transition: all .32s ease-in-out;
+}
 </style>

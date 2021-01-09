@@ -1,9 +1,9 @@
 <template>
   <section class="bg">
-    <section class="swiper-container" ref="slider">
-      <ul class="swiper-wrapper">
-        <li class="swiper-slide" v-for="(img,i) in banners" :key="'b'+i">
-            <img class="banner-img"  :src="img.imageUrl" alt="">
+    <section class="swiper-container stop"  ref="slider">
+      <ul class="swiper-wrapper stop">
+        <li class="swiper-slide stop" v-for="(img,i) in banners" :key="'b'+i">
+            <img class="banner-img stop"  :src="img.imageUrl" alt="">
             <!-- tagetId跳转待续 -->
             </li>
       </ul>

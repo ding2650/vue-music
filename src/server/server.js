@@ -61,4 +61,15 @@ export const playList = (params) => {
     return server.get('playlist/detail', { params })
 }
 
+// 歌手歌曲列表
+export const singerSongs = (params) => {
+    return server.get('artists', { params })
+}
+
+// 
+export const searchList = (params) => {
+    return server.get('search', { params })
+}
+
+
 
