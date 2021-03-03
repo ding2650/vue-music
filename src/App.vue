@@ -30,7 +30,7 @@
         </div>
         <!-- {{ songInfo.duration }} -->
         <div style="margin: 0 4vw 0 2vw" @click.stop="STOP">
-          <StepBar ref="percentBar" @pause="pause" @play="continuePlay" >
+          <StepBar ref="percentBar" @pause="pause" @play="continuePlay">
           </StepBar>
         </div>
         <div>
@@ -78,6 +78,13 @@ export default {
   computed: {
     ...mapState(['songInfo', 'songsList', 'animationStatus', 'fixShow']),
   },
+  watch: {
+    'songInfo.id': {
+      handler: function () {
+        this.$refs.percentBar.reset()
+      },
+    },
+  },
   mounted() {
     this.audio = this.$refs.audio
     this.audio.addEventListener('ended', () => {
@@ -97,7 +104,7 @@ export default {
       this.setSongInfo({ duration: this.audio.duration })
       this.audio.play()
       this.createRotateAnimation()
-      this.$refs.percentBar.reset()
+      this.$refs.percentBar.reset(true)
       this.$refs.percentBar.start(this.audio.duration)
       this.audio.addEventListener('timeupdate', () => {
         this.$refs.play.changeGcIndex(this.audio.currentTime)
@@ -127,12 +134,19 @@ export default {
       this.audio.play()
     },
     updateTime(val) {
-      this.audio.currentTime = val
+      if (this.songInfo.isPlay) {
+        this.audio.currentTime = val
+      }
+      let percent = (val / this.audio.duration) * 100
+      this.$refs.percentBar.setPercent(percent)
     },
     continuePlay() {
-      this.setSongInfo({ idPlay: true })
+      this.setSongInfo({ isPlay: true })
       this.audio.play()
+      this.audio.currentTime = this.songInfo.currentTime
+
       this.$refs.percentBar.setPlayStatus()
+      this.$refs.percentBar.continue()
       this.$refs.play.setPlayStatus()
       this.timer = setInterval(() => {
         this.setSongInfo({ angle: this.songInfo.angle + 0.36 })
@@ -140,7 +154,9 @@ export default {
     },
 
     pause() {
+      console.log('暂停')
       clearInterval(this.timer)
+      this.$refs.percentBar.pause()
       this.$refs.percentBar.setPauseStatus()
       this.$refs.play.setPauseStatus()
       this.setSongInfo({ isPlay: false })
@@ -150,6 +166,9 @@ export default {
 }
 </script>>
 <style lang="scss" >
+#app{
+  color: var(--font-color);
+}
 .hide{
   transform: translateY(100%);
 }
@@ -199,34 +218,27 @@ export default {
   transition: all .32s ease-in-out;
   transform-origin: left bottom;
 }
-.in-enter {
-  transform: translateX(100%) rotateZ(90deg);
-}
+.in-enter,
+.out-leave-to,
 .in-leave-to {
   transform: translateX(100%) rotateZ(90deg);
 }
-.out-enter {
-  transform: translate(0, 0, 0);
-}
-.out-leave-to {
-  transform: translateX(100%) rotateZ(90deg);
-}
-.fade-enter{
-  transform: translateY(100%);
-}
+
+.fade-enter,
 .fade-leave-to{
   transform: translateY(100%);
 }
 .fade-enter-active,
 .fade-leave-active{
-  transition: all .32s ease-in-out;
+  transition: all .52s ease-in-out;
 }
-.in-enter-active,
+.out-leave-active,
 .in-leave-active,
-.out-leave-active {
-  transition: all 0.42s ease-out;
+.in-enter-active{
+   transition: all .52s ease-out;
   transform-origin: 100% 100%;
 }
+
 .fix {
   position: fixed;
   top: 0;

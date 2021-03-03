@@ -39,18 +39,16 @@
     </div>
     <div class="fix-singer" ref="content">
       <ul class="bs" ref="bs">
-        <Loading :mask='!isFirst' :show="show" />
-
+        <Loading :mask="!isFirst" :show="show" />
         <router-link
           tag="li"
           class="card"
           v-for="(singer, i) in singerList"
           :key="'s' + i"
-          :to="'/singerSongs/'+singer.id"
-
+          :to="'/singerSongs/' + singer.id"
         >
           <div class="avatar">
-            <img  ref="img" :src="singer.picUrl"  alt="" />
+            <img ref="img" :src="singer.picUrl" alt="" />
           </div>
           {{ singer.name }}
         </router-link>
@@ -72,7 +70,7 @@ export default {
     return {
       scrollType: null,
       singerList: [],
-      isFirst:true,
+      isFirst: true,
       scrollLetter: null,
       show: false,
       typeIndex: -1,
@@ -314,14 +312,15 @@ export default {
   methods: {
     stop() {},
     loadImg() {
+            this.show = false
       let _count = 0
       this.$refs.img.forEach((item) => {
         item.onload = () => {
-        _count ++ 
-        if(_count === this.$refs.img.length){
-          this.show =false
-          this.isFirst = false
-        }
+          _count++
+          if (_count === this.$refs.img.length) {
+            // this.show = false
+            this.isFirst = false
+          }
         }
       })
     },
@@ -329,7 +328,7 @@ export default {
       this.scrollType.refresh()
       this.scrollLetter.refresh()
     },
-    
+
     handlerChangeTypeIndex(i) {
       this.typeIndex = this.typeIndex === i ? -1 : i
       this.requsetParams =

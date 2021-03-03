@@ -1,6 +1,6 @@
 <template>
   <section class="playList-container fix" ref="bs">
-    <main :class="fixShow?'padding-bot':''">
+    <main :class="fixShow ? 'padding-bot' : ''" class="main">
       <div class="header">
         <div class="bg">
           <img class="bg-img" :src="infos.picUrl" alt="" />
@@ -9,9 +9,8 @@
         <div class="content">
           <header>
             <Back style="transform: translateY(0.05rem)" />
-            <h3>{{infos.name}}</h3>
+            <h3>{{ infos.name }}</h3>
           </header>
-         
         </div>
       </div>
       <div class="list">
@@ -22,41 +21,51 @@
               name="play-circle-o"
               size=".5rem"
             />
-            播放全部<span class="span">(共{{list.length}}首)</span>
+            播放全部<span class="span">(共{{ list.length }}首)</span>
           </section>
-         
         </header>
         <ul class="songs">
-          <li class="songs-item" v-for="(item, i) in list" :key="i" @click="createAnimate($event,item,i)">
+          <li
+            class="songs-item"
+            v-for="(item, i) in list"
+            :key="i"
+            @click="createAnimate($event, item, i)"
+          >
             <div class="order">{{ i + 1 }}</div>
             <div class="info">
               <p class="tit">{{ item.name }}</p>
               <p class="singer">
-                {{ formatAuthor(item.ar) + "-" + item.al.name }}
+                {{ formatAuthor(item.ar) + '-' + item.al.name }}
               </p>
             </div>
           </li>
-            <li style="height:.96rem"></li>
-
+          <li style="height: 0.96rem"></li>
         </ul>
       </div>
     </main>
-    <span class="song-animate" @animationend='show = false'  v-if="show" :style="`top:${top}px;left:${left}px`">
-      <van-icon class="like" name="like" color="#f47983" size=".52rem"/>
+    <span
+      class="song-animate"
+      @animationend="show = false"
+      v-if="show"
+      :style="`top:${top}px;left:${left}px`"
+    >
+      <van-icon class="like" name="like" color="#f47983" size=".52rem" />
     </span>
-    
+    <Cube :arr="rotArr" />
   </section>
 </template>
 
 <script>
-import Back from "@com/common/Back";
-import { formatCount } from "@tools/tools";
-import { singerSongs } from "@api/server";
-import BS from "better-scroll";
-import { mapActions, mapMutations, mapState } from 'vuex';
+import Back from '@com/common/Back'
+import Cube from '../components/common/Cube'
+import { formatCount } from '@tools/tools'
+import { singerSongs } from '@api/server'
+import BS from 'better-scroll'
+import { mapActions, mapMutations, mapState } from 'vuex'
 export default {
   components: {
     Back,
+    Cube,
   },
 
   data() {
@@ -64,72 +73,95 @@ export default {
       infos: {},
       list: [],
       scroll: null,
-      show:false,
-      top:0,
-      left:0
-    };
+      show: false,
+      top: 0,
+      left: 0,
+    }
   },
-  computed:{
-    ...mapState(['fixShow'])
+
+  activated() {
+    this.setAnimationStatus(false)
+    this.getList()
+  },
+  computed: {
+    ...mapState(['fixShow']),
+    rotArr() {
+      let _arr = [...this.list].sort(()=>{
+        return Math.random() - 0.5
+      })
+      return _arr.slice(0,6)
+      
+    },
+  },
+  mounted() {
+    this.initScoll()
   },
   methods: {
     ...mapActions(['getSong']),
-    ...mapMutations(['setSongInfo','pushSong','setFixShow','setAnimationStatus']),
-    back(){
-      console.log(11)
-      this.$router.back()
-    },
-    createAnimate (e,{id},i) {
+    ...mapMutations([
+      'setSongInfo',
+      'pushSong',
+      'setFixShow',
+      'setAnimationStatus',
+    ]),
+    createAnimate(e, { id }, i) {
       // 设置动画
       this.top = e.clientY
       this.left = e.clientX
       this.show = true
       this.setSongInfo({
-        imgUrl:this.list[i].al.picUrl,
-        name:this.list[i].name,
-        artist:this.formatAuthor(this.list[i].ar),
-        isPlay:true,
-        id
+        imgUrl: this.list[i].al.picUrl,
+        name: this.list[i].name,
+        artist: this.formatAuthor(this.list[i].ar),
+        isPlay: true,
+        id,
       })
       this.setFixShow()
-      this.getSong({id})
-
+      this.getSong({ id })
     },
     initScoll() {
       this.scroll = new BS(this.$refs.bs, {
         startY: true,
         click: true,
-        bounce: false
-      });
+        bounce: false,
+      })
     },
     formatAuthor(arr) {
-      if (arr.length === 1) return arr[0].name;
+      if (arr.length === 1) return arr[0].name
       return arr.reduce((cur, nex, i) => {
-        return cur + nex.name + (i === arr.length - 1 ? "" : " / ");
-      }, "");
+        return cur + nex.name + (i === arr.length - 1 ? '' : ' / ')
+      }, '')
     },
     getList() {
       singerSongs({ id: this.$route.params.id }).then((res) => {
-        this.infos = res.data.artist;
-        this.list = res.data.hotSongs;
-        setTimeout(() => {
-          this.$nextTick(() => {
-            this.initScoll();
-          });
-        }, 320);
-      });
+        this.infos = res.data.artist
+        this.list = res.data.hotSongs
+        this.$nextTick(() => {
+          this.scroll.refresh()
+        })
+      })
     },
     formatCount,
   },
-
-  activated() {
-    this.setAnimationStatus(false)
-    this.getList();
-  },
-};
+}
 </script>
 
 <style lang='scss' scoped>
+.cube{
+  position: absolute;
+  right: .52rem;
+  top:.32rem;
+  transform: translateX(-50%);
+  height: 2rem;
+  width: 2rem;
+  transform-origin: right top;
+  transform: scale(.52);
+  opacity: .88;
+}
+.main{
+  background: #fff;
+  min-height: 100vh;
+}
 .song-animate{
   position: fixed;
   // top: 50%;

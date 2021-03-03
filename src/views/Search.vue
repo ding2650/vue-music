@@ -95,7 +95,8 @@ export default {
   computed: {
     ...mapState(['fixShow']),
   },
-  created() {
+
+  activated() {
     this.getList()
     this.setAnimationStatus(false)
   },

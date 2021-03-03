@@ -1,6 +1,6 @@
 <template>
   <section class="playList-container fix" ref="bs">
-    <main :class="fixShow?'padding-bot':''">
+    <main >
       <div class="header">
         <div class="bg">
           <img class="bg-img" :src="infos.coverImgUrl" alt="" />
@@ -107,16 +107,16 @@ export default {
       left:0
     };
   },
+  mounted(){
+    this.initScoll()
+  },
   computed:{
     ...mapState(['fixShow'])
   },
   methods: {
     ...mapActions(['getSong']),
     ...mapMutations(['setSongInfo','pushSong','setFixShow','setAnimationStatus']),
-    back(){
-      console.log(11)
-      this.$router.back()
-    },
+    
     createAnimate (e,{id},i) {
       // 设置动画
       this.top = e.clientY
@@ -135,9 +135,10 @@ export default {
     },
     initScoll() {
       this.scroll = new BS(this.$refs.bs, {
-        startY: true,
         click: true,
-        bounce: false
+        bounce: {
+          top:false,
+        }
       });
     },
     formatAuthor(arr) {
@@ -150,11 +151,9 @@ export default {
       playList({ id: this.$route.params.id }).then((res) => {
         this.infos = res.data.playlist;
         this.list = res.data.playlist.tracks;
-        setTimeout(() => {
-          this.$nextTick(() => {
-            this.initScoll();
-          });
-        }, 320);
+        this.$nextTick(()=>{
+          this.scroll.refresh()
+        })
       });
     },
     formatCount,
@@ -174,6 +173,9 @@ export default {
   // right: 45%;
   z-index: 99;
   animation: hor 1s linear ;
+}
+main{
+  min-height: 100vh;
 }
 .like{
   position: absolute;

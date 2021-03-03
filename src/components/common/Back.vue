@@ -1,5 +1,5 @@
 <template>
-  <section class="back" @touchstart.stop.prevent="back">
+  <section class="back" @touchstart="back">
     <van-icon name="arrow-left" class="arrow" size="18" color="#fff" />
   </section>
 </template>
@@ -8,7 +8,6 @@
 export default {
   methods :{
     back () {
-      console.log(111)
       this.$router.back()
     }
   }

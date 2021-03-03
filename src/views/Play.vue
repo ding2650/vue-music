@@ -1,5 +1,10 @@
 <template>
-  <section :open="open" :hide="hide" :setPlayStatus='setPlayStatus' :setPauseStatus='setPauseStatus'>
+  <section
+    :open="open"
+    :hide="hide"
+    :setPlayStatus="setPlayStatus"
+    :setPauseStatus="setPauseStatus"
+  >
     <transition name="playing" appear>
       <div v-if="show" class="play-container">
         <img :src="songInfo.imgUrl" alt="" class="bg" />
@@ -57,7 +62,7 @@
               >
             </div>
             <div class="line">
-              <span class="nowtime">{{
+              <span class="nowtime" style="color: #ccc">{{
                 formatMinutes(songInfo.currentTime)
               }}</span>
               <van-slider
@@ -72,23 +77,30 @@
                   <div class="slider-btn"></div>
                 </template>
               </van-slider>
-              <span class="alltime">{{
+              <span class="alltime" style="color: #ccc">{{
                 formatMinutes(songInfo.duration)
               }}</span>
             </div>
 
             <div class="control">
-              <i class="iconfont icon-danquxunhuan"></i>
-              <i class="iconfont icon-previous"></i>
+              <i class="iconfont icon-danquxunhuan" style="color: #ccc"></i>
+              <i class="iconfont icon-previous" style="color: #ccc"></i>
               <van-icon
                 name="pause-circle-o"
                 size="1rem"
+                color="#ccc"
                 v-if="isPlay"
                 @click="pause"
               />
-              <van-icon name="play-circle-o" size="1rem" v-else @click="play" />
-              <i class="iconfont icon-next-music"></i>
-              <i class="iconfont icon-bofangliebiao"></i>
+              <van-icon
+                name="play-circle-o"
+                size="1rem"
+                v-else
+                @click="play"
+                color="#ccc"
+              />
+              <i class="iconfont icon-next-music" style="color: #ccc"></i>
+              <i class="iconfont icon-bofangliebiao" style="color: #ccc"></i>
             </div>
           </section>
         </main>
@@ -156,8 +168,13 @@ export default {
     },
     // 更改播放歌曲的当前时间
     changeSongDuration(val) {
+      if (!this.songInfo.isPlay) {
+        this.songInfo.currentTime = val
+      }
+      this.changeGcIndex(val)
       this.$emit('updateTime', val)
     },
+   
     // 设置暂停状态
     setPauseStatus() {
       this.isPlay = false
@@ -166,7 +183,7 @@ export default {
     },
     // 设置播放状态
     setPlayStatus() {
-      if(this.isPlay) return
+      if (this.isPlay) return
       this.isPlay = true
       this.timer = setInterval(() => {
         this.angle += 0.12
@@ -174,7 +191,7 @@ export default {
     },
     // 暂停歌曲
     pause() {
-      if(!this.isPlay)  return
+      if (!this.isPlay) return
       this.$emit('pause')
       this.setPauseStatus()
     },
@@ -343,6 +360,7 @@ export default {
     .controls {
       height: 24vh;
       padding: 0.2rem;
+      background: rgba($color: #000, $alpha: .08);
       .v {
         display: flex;
         font-size: 0.32rem;

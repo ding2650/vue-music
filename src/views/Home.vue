@@ -1,6 +1,6 @@
 <template>
   <div class="home fix">
-    <Setting ref='setting' />
+    <Setting ref="setting" />
     <header>
       <van-icon @click="openDrawer" name="wap-nav" size="26" />
       <span> Music </span>
@@ -25,17 +25,18 @@
       </div>
     </nav>
     <div class="home-container" @touchstart="start" @touchend="end">
-      <keep-alive>
-        <transition :name="deriction">
+      <transition :name="deriction">
+        <keep-alive>
           <router-view class="type" ref="type" />
-        </transition>
-      </keep-alive>
+        </keep-alive>
+      </transition>
     </div>
   </div>
 </template>
 
 <script>
 // import Banner from "@com/home/Banner";
+
 import Setting from '../components/home/components/IndexDrawer'
 import BS from 'better-scroll'
 import { mapMutations, mapState } from 'vuex'
@@ -44,7 +45,7 @@ const RIGHT = 'fromRight'
 export default {
   name: 'Home',
   components: {
-    Setting
+    Setting,
   },
   data() {
     return {
@@ -67,30 +68,36 @@ export default {
   computed: {
     ...mapState(['fixShow']),
   },
+  mounted(){
+    setTimeout(() => {
+    this.toggle(this.navsArr[0].to,0)
+      
+    }, 250);
+  },
   activated() {
     this.setAnimationStatus(true)
-    let index = this.getCurIndex()
+    this.activeIndex = this.getCurIndex()
     setTimeout(() => {
-      this.setLine(index)
+      this.setLine()
     }, 0)
   },
   methods: {
     ...mapMutations(['setAnimationStatus']),
-    linkSearch(){
+    linkSearch() {
       this.setAnimationStatus(true)
       this.$router.push('/search')
     },
-    openDrawer(){
+    openDrawer() {
       this.$refs.setting.open()
     },
-    getCurIndex(){
+    getCurIndex() {
       return this.navsArr.findIndex((item) => {
-      return this.$route.path === item.to
-    })
+        return this.$route.path === item.to
+      })
     },
     start(e) {
-      let flag =  /stop/g.test(e.target.className)
-      if(flag) return
+      let flag = /stop/g.test(e.target.className)
+      if (flag) return
 
       this.isFastSlid = true
       this.initPoint = {
@@ -103,24 +110,21 @@ export default {
       }, this.fastTime)
     },
     linkToLeft() {
-      console.log(1)
       let index = this.getCurIndex()
       let target = this.navsArr[index + 1] || this.navsArr[index]
       this.toggle(target.to, ++index)
     },
     linkToRight() {
-
       let index = this.getCurIndex()
       let target = this.navsArr[index - 1] || this.navsArr[index]
       this.toggle(target.to, --index)
     },
     end(e) {
-      if (!this.isFastSlid || e.target.tagName==='SPAN') return
+      if (!this.isFastSlid || e.target.tagName === 'SPAN') return
       let endPoint = e.changedTouches[0]
       let absX = this.initPoint.x - endPoint.screenX
       let absY = this.initPoint.y - endPoint.screenY
       let distance = Math.abs(absX) - Math.abs(absY)
-      console.log(e)
       if (distance > 0) {
         if (absX > 0) {
           this.linkToLeft()
@@ -133,7 +137,7 @@ export default {
       clearTimeout(this.timer)
     },
     // 横条left
-    setLine() {
+    setLine(index) {
       let el = this.$refs.navItem[this.activeIndex]
       this.$refs.line.style.left = el.offsetLeft + 'px'
     },
@@ -185,10 +189,31 @@ export default {
     display: flex;
     justify-content: space-around;
     padding: 0.24rem 0;
-    padding-bottom: 0.32rem;
+    padding-bottom: 0.36rem;
+    transition: all .32s ease-in-out;
     color: rgba(255, 255, 255, 0.881);
     .active {
-      color: white;
+        color: rgb(255, 25, 25);
+        position: relative;
+        overflow: hidden;
+        &::before{
+          content: '';
+          background: #eee;
+          opacity: .52;
+          position: absolute;
+          top: 100%;
+          left: -120%;
+          transform:rotateZ(-45deg) translateY(100%);
+          transform-origin: left;
+          width: 200%;
+          height: .12rem;
+          animation: flame .52s ease-in-out;
+        }
+    }
+  }
+  @keyframes flame {
+    to{
+      left: 100%;
     }
   }
   .line {
@@ -198,11 +223,12 @@ export default {
     height: 0.05rem;
     border-radius: 1px;
     transition: all 0.3s ease-in-out;
-    transform: scaleX(1.5);
+    transform: scaleX(1.5); 
     transform-origin: 50% 50%;
     color: transparent;
     width: max-content;
-    background: linear-gradient(to right, white, #eee);
+    // background: linear-gradient(to right, white, #f35336);
+    background:#f35336;
   }
 }
 

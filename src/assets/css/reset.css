@@ -17,15 +17,25 @@ a{
     width: 100%;
     height: 100%;
 }
-/* 颜色 */
-#light-theme{
-    --font-color:#333;
-    --bg-color:#f0f0f4;
+/* 换肤 */
+#lightTheme{
+    --color:#333;
+    --bg:#f0f0f4;
+}
+#darkTheme{
+    --color:#f0f0f4;
+    --bg:#333;
 }
 :root{
     --bg-color:#f0f0f4;
+    --font-color:#333;
     --color:#00aefd;
 
+}
+.def-color{
+    color: transparent !important;
+  background: linear-gradient(to top, #dc3023, #fff);
+  -webkit-background-clip: text;
 }
 /* 动画 */
 /* 播放旋转动画 */

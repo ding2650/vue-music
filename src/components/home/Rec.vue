@@ -1,7 +1,7 @@
 <template>
   <section class="rec" ref="content">
     <main class="bs" ref="bs">
-    <Loading :show="loading" />
+      <Loading :show="loading" />
       <Banner />
       <section class="body" :style="hideSty">
         <h5 class="vertical-line">推荐歌单</h5>
@@ -51,12 +51,10 @@ export default {
   created() {
     this.getList()
   },
-  onload(){
-    this.initScroll
+  mounted(){
+    this.initScroll()
   },
-  activated() {
-    // this.$nextTick(this.initScroll)
-  },
+ 
   computed: {
     ...mapState(['fixShow']),
     hideSty() {
@@ -81,8 +79,8 @@ export default {
       this.scroll = new BS(this.$refs.content, {
         click: true,
         probeType: 2,
+        bounce: true,
       })
-      
     },
 
     getList() {
@@ -94,10 +92,10 @@ export default {
               this.count++
               if (this.count === this.recList.length) {
                 this.loading = false
+                this.scroll.refresh()
               }
             }
           })
-          // this.scroll.refresh()
         })
       })
     },
@@ -110,7 +108,7 @@ export default {
 .rec {
   width: 100%;
   height: 100%;
-  overflow: scroll;
+  overflow: hidden;;
   z-index: 1s;
   position: absolute;
   top: 0;

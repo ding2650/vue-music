@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 
 Vue.use(Vuex)
-import { song, songDetail, lyric, album, getSongInfo } from "../server/server";
+import { song } from "../server/server";
 export default new Vuex.Store({
   state: {
     songInfo: {
@@ -30,15 +30,13 @@ export default new Vuex.Store({
     songsList: []
   },
   mutations: {
-    setAnimationStatus(state,flag){
-      console.log(state.animationStatus)
-      // state.animationStatus.mode = flag?'in-out':'out-in'
-      state.animationStatus.name = flag?'in':'out'
+    setAnimationStatus(state, flag) {
+      state.animationStatus.name = flag ? 'in' : 'out'
     },
     setGCList(state, payload) {
       state.gcList = payload
     },
-    setCurrentTime(state,val){
+    setCurrentTime(state, val) {
       state.songInfo.currentTime = val
     },
     // 设置歌曲信息

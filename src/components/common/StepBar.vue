@@ -1,5 +1,5 @@
 <template>
-  <section class="step-wrapper" :start="start" :pause="pause"  :setPlayStatus='setPlayStatus' :setPauseStatus='setPauseStatus'>
+  <section class="step-wrapper">
     <canvas id="bar" ref="bar" width="34" height="34"></canvas>
     <div class="block" @click="changeStatus">
       <img
@@ -29,7 +29,6 @@ export default {
   },
   computed: {
     intervalTime() {
-      console.log(this.duration)
       return this.duration * 10
     },
   },
@@ -42,27 +41,39 @@ export default {
         this.$emit('pause')
       }
     },
-    setPauseStatus(){
+    setPauseStatus() {
       this.isPlay = false
     },
-     setPlayStatus(){
+    setPlayStatus() {
       this.isPlay = true
     },
-    
-    start(num) {
-      this.duration = num
+    continue() {
+      clearTimeout(this.timer)
       this.timer = setInterval(() => {
-        if (this.percent === 100) {
+        if (this.percent >= 100) {
           clearInterval(this.timer)
         }
         this.percent += 0.125
-        this.num++
         this.draw()
       }, this.intervalTime / 8)
     },
-    reset() {
-      this.percent = 0
-      this.isPlay = true  
+    start(num) {
+      clearTimeout(this.timer)
+      this.duration = num
+      // 100s => 1s
+      this.timer = setInterval(() => {
+        if (this.percent >= 100) {
+          clearInterval(this.timer)
+        }
+        this.percent += 0.125
+        this.draw()
+      }, this.intervalTime / 8)
+    },
+    reset(percentFlag) {
+      if (!percentFlag) {
+        this.percent = 0
+      }
+      this.isPlay = true
     },
     draw() {
       this.$refs.bar.height = 34
@@ -72,11 +83,15 @@ export default {
         17,
         17,
         Math.PI * -0.5,
-        (Math.PI * (this.percent - 50)) / 100,
+        (Math.PI * (this.percent * 2 - 50)) / 100,
         false
       )
       this.ctx.fillStyle = '#00aefd'
       this.ctx.fill()
+    },
+    setPercent(percent) {
+      this.percent = percent
+      this.draw()
     },
     pause() {
       clearInterval(this.timer)
