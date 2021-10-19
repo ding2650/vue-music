@@ -1,5 +1,5 @@
 import axios from 'axios'
-const BASEURL = 'http://dddlh.fun:3000'
+const BASEURL = 'localhost:3000'
 const server = axios.create({
     baseURL: BASEURL,
     timeout: 120000
